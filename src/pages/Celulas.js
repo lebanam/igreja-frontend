@@ -1,6 +1,4 @@
-me retorne o codigo com as alterações:
-
-    import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Home } from "lucide-react";
 import "./Celulas.css";
