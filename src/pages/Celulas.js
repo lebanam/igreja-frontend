@@ -20,7 +20,6 @@ function Celulas() {
     const [lider, setLider] = useState("");
     const [coLider, setCoLider] = useState("");
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
-
     const [buscaMembro, setBuscaMembro] = useState("");
 
     useEffect(() => {
@@ -54,10 +53,15 @@ function Celulas() {
         }
     };
 
-    const membrosFiltrados = membros.filter((m) =>
-        m.nome.toLowerCase().includes(buscaMembro.toLowerCase()) ||
-        m.email?.toLowerCase().includes(buscaMembro.toLowerCase())
-    );
+    const membrosFiltrados = membros.filter((m) => {
+        const termo = buscaMembro.toLowerCase();
+
+        return (
+            m.nome?.toLowerCase().includes(termo) ||
+            m.email?.toLowerCase().includes(termo) ||
+            m.telefone?.toLowerCase().includes(termo)
+        );
+    });
 
     const limparFormulario = () => {
         setNome("");
@@ -70,6 +74,11 @@ function Celulas() {
         setBuscaMembro("");
         setCelulaSelecionada(null);
         setModoFormulario(false);
+    };
+
+    const abrirNovaCelula = () => {
+        limparFormulario();
+        setModoFormulario(true);
     };
 
     const salvarCelula = async () => {
@@ -108,6 +117,7 @@ function Celulas() {
             alert("Célula salva com sucesso!");
             limparFormulario();
             carregarCelulas();
+            carregarMembros();
         } catch (error) {
             alert(error.message);
         }
@@ -121,11 +131,14 @@ function Celulas() {
         setOnde(celula.onde || "");
         setLider(celula.lider || "");
         setCoLider(celula.coLider || "");
+        setBuscaMembro("");
+
         setMembrosSelecionados(
             Array.isArray(celula.membros)
                 ? celula.membros.map((m) => String(m.id))
                 : []
         );
+
         setModoFormulario(true);
     };
 
@@ -142,6 +155,7 @@ function Celulas() {
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
             carregarCelulas();
+            carregarMembros();
         } catch (error) {
             alert(error.message);
         }
@@ -163,7 +177,7 @@ function Celulas() {
 
             <h1 className="page-title">Células</h1>
 
-            <button className="primary-button" onClick={() => setModoFormulario(true)}>
+            <button className="primary-button" onClick={abrirNovaCelula}>
                 Nova Célula
             </button>
 
@@ -171,17 +185,46 @@ function Celulas() {
                 <div className="form-card">
                     <h2>{celulaSelecionada ? "Editar Célula" : "Cadastrar Célula"}</h2>
 
-                    <input placeholder="Nome da célula" value={nome} onChange={(e) => setNome(e.target.value)} />
-                    <input placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
-                    <input placeholder="Quando" value={quando} onChange={(e) => setQuando(e.target.value)} />
-                    <input placeholder="Onde" value={onde} onChange={(e) => setOnde(e.target.value)} />
-                    <input placeholder="Líder" value={lider} onChange={(e) => setLider(e.target.value)} />
-                    <input placeholder="Co-líder" value={coLider} onChange={(e) => setCoLider(e.target.value)} />
+                    <input
+                        placeholder="Nome da célula"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Tema"
+                        value={tema}
+                        onChange={(e) => setTema(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Quando"
+                        value={quando}
+                        onChange={(e) => setQuando(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Onde"
+                        value={onde}
+                        onChange={(e) => setOnde(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Líder"
+                        value={lider}
+                        onChange={(e) => setLider(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Co-líder"
+                        value={coLider}
+                        onChange={(e) => setCoLider(e.target.value)}
+                    />
 
                     <h3>Membros</h3>
 
                     <input
-                        placeholder="Pesquisar membro..."
+                        placeholder="Pesquisar membro por nome, email ou telefone..."
                         value={buscaMembro}
                         onChange={(e) => setBuscaMembro(e.target.value)}
                     />
@@ -219,7 +262,11 @@ function Celulas() {
 
             <div className="card-grid celulas-grid">
                 {celulas.map((celula) => (
-                    <div key={celula.id} className="menu-card" onClick={() => setCelulaSelecionada(celula)}>
+                    <div
+                        key={celula.id}
+                        className="menu-card"
+                        onClick={() => setCelulaSelecionada(celula)}
+                    >
                         <div className="menu-icon">
                             <Home size={28} />
                         </div>
@@ -251,6 +298,29 @@ function Celulas() {
                             ))}
                         </ul>
                     )}
+
+                    <div className="button-row">
+                        <button
+                            className="secondary-button"
+                            onClick={() => editarCelula(celulaSelecionada)}
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            className="danger-button"
+                            onClick={() => excluirCelula(celulaSelecionada.id)}
+                        >
+                            Excluir
+                        </button>
+
+                        <button
+                            className="secondary-button"
+                            onClick={() => setCelulaSelecionada(null)}
+                        >
+                            Fechar
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
