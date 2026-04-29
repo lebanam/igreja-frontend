@@ -14,7 +14,7 @@ function ListaMembros() {
     const [telefoneEdit, setTelefoneEdit] = useState("");
     const [batizadoEdit, setBatizadoEdit] = useState(false);
     const [membroDesdeEdit, setMembroDesdeEdit] = useState("");
-    const [gcIdEdit, setGcIdEdit] = useState("");
+    const [gcEdit, setGcEdit] = useState("");
     const [voluntarioEdit, setVoluntarioEdit] = useState(false);
 
     useEffect(() => {
@@ -33,7 +33,8 @@ function ListaMembros() {
             const data = await response.json();
             setMembros(Array.isArray(data) ? data : []);
         } catch (error) {
-            alert(error.message);
+            console.error("Erro ao carregar membros:", error);
+            alert("Erro ao carregar membros");
             setMembros([]);
         }
     };
@@ -49,7 +50,8 @@ function ListaMembros() {
             const data = await response.json();
             setCelulas(Array.isArray(data) ? data : []);
         } catch (error) {
-            alert(error.message);
+            console.error("Erro ao carregar células:", error);
+            alert("Erro ao carregar células");
             setCelulas([]);
         }
     };
@@ -62,7 +64,7 @@ function ListaMembros() {
         setTelefoneEdit(membro.telefone || "");
         setBatizadoEdit(Boolean(membro.batizado));
         setMembroDesdeEdit(membro.membroDesde || "");
-        setGcIdEdit(membro.gc?.id ? String(membro.gc.id) : "");
+        setGcEdit(membro.gc || "");
         setVoluntarioEdit(Boolean(membro.voluntario));
     };
 
@@ -74,7 +76,7 @@ function ListaMembros() {
         setTelefoneEdit("");
         setBatizadoEdit(false);
         setMembroDesdeEdit("");
-        setGcIdEdit("");
+        setGcEdit("");
         setVoluntarioEdit(false);
     };
 
@@ -94,34 +96,38 @@ function ListaMembros() {
             return;
         }
 
+        const dados = {
+            nome: nomeEdit,
+            email: emailEdit,
+            cpf: cpfEdit,
+            telefone: telefoneEdit,
+            batizado: batizadoEdit,
+            membroDesde: membroDesdeEdit || null,
+            gc: gcEdit,
+            voluntario: voluntarioEdit
+        };
+
         try {
             const response = await fetch(`${API_URL}/membros/${membroEditando.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    nome: nomeEdit,
-                    email: emailEdit,
-                    cpf: cpfEdit,
-                    telefone: telefoneEdit,
-                    batizado: batizadoEdit,
-                    membroDesde: membroDesdeEdit || null,
-                    gcId: gcIdEdit ? Number(gcIdEdit) : null,
-                    voluntario: voluntarioEdit
-                })
+                body: JSON.stringify(dados)
             });
 
             const text = await response.text();
 
             if (!response.ok) {
-                throw new Error(text || "Erro ao atualizar");
+                console.error("Erro ao atualizar membro:", text);
+                throw new Error("Erro ao atualizar membro");
             }
 
             alert("Membro atualizado com sucesso!");
             cancelarEdicao();
             carregarMembros();
         } catch (error) {
+            console.error("Erro ao salvar edição:", error);
             alert(error.message);
         }
     };
@@ -139,8 +145,10 @@ function ListaMembros() {
                 throw new Error("Erro ao excluir membro");
             }
 
+            alert("Membro excluído com sucesso!");
             carregarMembros();
         } catch (error) {
+            console.error("Erro ao excluir membro:", error);
             alert(error.message);
         }
     };
@@ -197,10 +205,10 @@ function ListaMembros() {
                         />
                     </label>
 
-                    <select value={gcIdEdit} onChange={(e) => setGcIdEdit(e.target.value)}>
+                    <select value={gcEdit} onChange={(e) => setGcEdit(e.target.value)}>
                         <option value="">Selecione uma célula</option>
                         {celulas.map((c) => (
-                            <option key={c.id} value={c.id}>
+                            <option key={c.id} value={c.nome}>
                                 {c.nome}
                             </option>
                         ))}
@@ -254,7 +262,7 @@ function ListaMembros() {
                             <td>{m.telefone || "-"}</td>
                             <td>{m.batizado ? "Sim" : "Não"}</td>
                             <td>{m.membroDesde || "-"}</td>
-                            <td>{m.gc?.nome || "-"}</td>
+                            <td>{m.gc || "-"}</td>
                             <td>{m.voluntario ? "Sim" : "Não"}</td>
                             <td>
                                 <div className="table-actions">

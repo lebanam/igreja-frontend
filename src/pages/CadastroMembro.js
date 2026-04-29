@@ -10,7 +10,7 @@ function CadastroMembro() {
     const [telefone, setTelefone] = useState("");
     const [batizado, setBatizado] = useState(false);
     const [membroDesde, setMembroDesde] = useState("");
-    const [gcId, setGcId] = useState("");
+    const [gc, setGc] = useState("");
     const [voluntario, setVoluntario] = useState(false);
     const [celulas, setCelulas] = useState([]);
 
@@ -29,7 +29,8 @@ function CadastroMembro() {
             const data = await response.json();
             setCelulas(Array.isArray(data) ? data : []);
         } catch (error) {
-            alert(error.message);
+            console.error("Erro ao carregar células:", error);
+            alert("Erro ao carregar células");
             setCelulas([]);
         }
     };
@@ -41,7 +42,7 @@ function CadastroMembro() {
         setTelefone("");
         setBatizado(false);
         setMembroDesde("");
-        setGcId("");
+        setGc("");
         setVoluntario(false);
     };
 
@@ -61,123 +62,114 @@ function CadastroMembro() {
             return;
         }
 
+        const dados = {
+            nome,
+            email,
+            cpf,
+            telefone,
+            batizado,
+            membroDesde: membroDesde || null,
+            gc,
+            voluntario
+        };
+
         try {
             const response = await fetch(`${API_URL}/membros`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    nome,
-                    email,
-                    cpf,
-                    telefone,
-                    batizado,
-                    membroDesde: membroDesde || null,
-                    gcId: gcId ? Number(gcId) : null,
-                    voluntario
-                })
+                body: JSON.stringify(dados)
             });
 
             const text = await response.text();
 
             if (!response.ok) {
-                throw new Error(text || "Erro ao salvar membro");
+                console.error("Erro ao salvar membro:", text);
+                throw new Error("Erro ao salvar membro");
             }
 
             alert("Membro cadastrado com sucesso!");
             limparFormulario();
-
         } catch (error) {
+            console.error("Erro ao cadastrar membro:", error);
             alert(error.message);
         }
     };
 
     return (
-        <div style={{ padding: "40px" }}>
+        <div className="form-card">
             <h2>Cadastro de Membro</h2>
 
-            <div style={{ marginTop: "20px" }}>
+            <input
+                placeholder="Nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+            />
+
+            <input
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <input
+                placeholder="CPF"
+                value={cpf}
+                onChange={(e) => setCpf(formatarCPF(e.target.value))}
+                maxLength={14}
+            />
+
+            <input
+                placeholder="Telefone"
+                value={telefone}
+                maxLength={15}
+                onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+            />
+
+            <label>
                 <input
-                    placeholder="Nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    type="checkbox"
+                    checked={batizado}
+                    onChange={(e) => setBatizado(e.target.checked)}
                 />
-            </div>
+                Batizado
+            </label>
 
-            <div style={{ marginTop: "10px" }}>
+            <label>
+                Membro desde:
                 <input
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    type="date"
+                    value={membroDesde}
+                    onChange={(e) => setMembroDesde(e.target.value)}
                 />
-            </div>
+            </label>
 
-            <div style={{ marginTop: "10px" }}>
+            <select value={gc} onChange={(e) => setGc(e.target.value)}>
+                <option value="">Selecione uma célula</option>
+                {celulas.map((c) => (
+                    <option key={c.id} value={c.nome}>
+                        {c.nome}
+                    </option>
+                ))}
+            </select>
+
+            <label>
                 <input
-                    placeholder="CPF"
-                    value={cpf}
-                    onChange={(e) => setCpf(formatarCPF(e.target.value))}
-                    maxLength={14}
+                    type="checkbox"
+                    checked={voluntario}
+                    onChange={(e) => setVoluntario(e.target.checked)}
                 />
-            </div>
+                Voluntário
+            </label>
 
-            <div style={{ marginTop: "10px" }}>
-                <input
-                    placeholder="Telefone"
-                    value={telefone}
-                    maxLength={15}
-                    onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
-                />
-            </div>
-
-            <div style={{ marginTop: "10px" }}>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={batizado}
-                        onChange={(e) => setBatizado(e.target.checked)}
-                    />
-                    Batizado
-                </label>
-            </div>
-
-            <div style={{ marginTop: "10px" }}>
-                <label>
-                    Membro desde:
-                    <input
-                        type="date"
-                        value={membroDesde}
-                        onChange={(e) => setMembroDesde(e.target.value)}
-                    />
-                </label>
-            </div>
-
-            <div style={{ marginTop: "10px" }}>
-                <select value={gcId} onChange={(e) => setGcId(e.target.value)}>
-                    <option value="">Selecione uma célula</option>
-                    {celulas.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.nome}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div style={{ marginTop: "10px" }}>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={voluntario}
-                        onChange={(e) => setVoluntario(e.target.checked)}
-                    />
-                    Voluntário
-                </label>
-            </div>
-
-            <div style={{ marginTop: "20px" }}>
+            <div className="button-row">
                 <button className="primary-button" onClick={salvar}>
                     Salvar
+                </button>
+
+                <button className="secondary-button" onClick={limparFormulario}>
+                    Limpar
                 </button>
             </div>
         </div>
