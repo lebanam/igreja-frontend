@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./Celulas.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
 
 function Celulas() {
+    const navigate = useNavigate();
     const [celulas, setCelulas] = useState([]);
     const [membros, setMembros] = useState([]);
     const [modoFormulario, setModoFormulario] = useState(false);
@@ -150,6 +152,10 @@ function Celulas() {
 
     return (
         <div className="page">
+            <button className="back-button" onClick={() => navigate("/home")}>
+                Início
+            </button>
+
             <h1 className="page-title">Células</h1>
 
             <button className="primary-button" onClick={() => setModoFormulario(true)}>

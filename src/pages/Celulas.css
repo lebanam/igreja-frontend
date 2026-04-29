@@ -18,7 +18,7 @@
 }
 
 .membro-checkbox {
-    background: #334155;
+    background: var(--bg-card-hover);
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
@@ -34,7 +34,7 @@
 }
 
 .membros-lista li {
-    background: #334155;
+    background: var(--bg-card-hover);
     margin-bottom: 8px;
     padding: 10px;
     border-radius: 8px;

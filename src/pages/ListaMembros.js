@@ -121,7 +121,6 @@ function ListaMembros() {
             alert("Membro atualizado com sucesso!");
             cancelarEdicao();
             carregarMembros();
-
         } catch (error) {
             alert(error.message);
         }
@@ -147,7 +146,7 @@ function ListaMembros() {
     };
 
     return (
-        <div style={{ padding: "40px" }}>
+        <div className="page-container">
             <h2>Lista de Membros</h2>
 
             {membroEditando && (
@@ -216,7 +215,7 @@ function ListaMembros() {
                         Voluntário
                     </label>
 
-                    <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "15px" }}>
+                    <div className="button-row">
                         <button className="primary-button" onClick={salvarEdicao}>
                             Salvar alterações
                         </button>
@@ -228,62 +227,59 @@ function ListaMembros() {
                 </div>
             )}
 
-            <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
-                <thead>
-                <tr>
-                    <th style={thStyle}>ID</th>
-                    <th style={thStyle}>Nome</th>
-                    <th style={thStyle}>Email</th>
-                    <th style={thStyle}>CPF</th>
-                    <th style={thStyle}>Telefone</th>
-                    <th style={thStyle}>Batizado</th>
-                    <th style={thStyle}>Membro desde</th>
-                    <th style={thStyle}>GC</th>
-                    <th style={thStyle}>Voluntário</th>
-                    <th style={thStyle}>Ações</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {membros.map((m) => (
-                    <tr key={m.id}>
-                        <td style={tdStyle}>{m.id}</td>
-                        <td style={tdStyle}>{m.nome}</td>
-                        <td style={tdStyle}>{m.email}</td>
-                        <td style={tdStyle}>{m.cpf}</td>
-                        <td style={tdStyle}>{m.telefone || "-"}</td>
-                        <td style={tdStyle}>{m.batizado ? "Sim" : "Não"}</td>
-                        <td style={tdStyle}>{m.membroDesde || "-"}</td>
-                        <td style={tdStyle}>{m.gc?.nome || "-"}</td>
-                        <td style={tdStyle}>{m.voluntario ? "Sim" : "Não"}</td>
-                        <td style={tdStyle}>
-                            <div style={{ display: "flex", gap: "8px" }}>
-                                <button className="secondary-button" onClick={() => iniciarEdicao(m)}>
-                                    Editar
-                                </button>
-
-                                <button className="danger-button" onClick={() => excluir(m.id)}>
-                                    Excluir
-                                </button>
-                            </div>
-                        </td>
+            <div className="table-container">
+                <table className="data-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>CPF</th>
+                        <th>Telefone</th>
+                        <th>Batizado</th>
+                        <th>Membro desde</th>
+                        <th>GC</th>
+                        <th>Voluntário</th>
+                        <th>Ações</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                    {membros.map((m) => (
+                        <tr key={m.id}>
+                            <td>{m.id}</td>
+                            <td>{m.nome}</td>
+                            <td>{m.email}</td>
+                            <td>{m.cpf}</td>
+                            <td>{m.telefone || "-"}</td>
+                            <td>{m.batizado ? "Sim" : "Não"}</td>
+                            <td>{m.membroDesde || "-"}</td>
+                            <td>{m.gc?.nome || "-"}</td>
+                            <td>{m.voluntario ? "Sim" : "Não"}</td>
+                            <td>
+                                <div className="table-actions">
+                                    <button
+                                        className="secondary-button"
+                                        onClick={() => iniciarEdicao(m)}
+                                    >
+                                        Editar
+                                    </button>
+
+                                    <button
+                                        className="danger-button"
+                                        onClick={() => excluir(m.id)}
+                                    >
+                                        Excluir
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
-
-const thStyle = {
-    border: "1px solid #475569",
-    padding: "10px",
-    textAlign: "left"
-};
-
-const tdStyle = {
-    border: "1px solid #475569",
-    padding: "10px"
-};
 
 export default ListaMembros;

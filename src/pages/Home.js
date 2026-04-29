@@ -1,41 +1,67 @@
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
+import {
+    Users,
+    Home as HomeIcon,
+    Folder,
+    Package,
+    DollarSign,
+    UserPlus,
+    BarChart3,
+    Baby,
+    CalendarDays
+} from "lucide-react";
 
 function Home() {
     const navigate = useNavigate();
 
     const cards = [
-        { title: "Membros", action: () => navigate("/membros") },
-        { title: "Células", icon: "🏠", action: () => navigate("/celulas") },
-        { title: "Ministérios", action: () => alert("Em breve") },
-        { title: "Inventário", action: () => alert("Em breve") },
-        { title: "Financeiro", action: () => alert("Em breve") },
-        { title: "Visitantes", action: () => alert("Em breve") },
-        { title: "Dashboard", action: () => alert("Em breve") },
-        { title: "Kids", action: () => alert("Em breve") },
-        { title: "Eventos", action: () => alert("Em breve") },
+        { title: "Membros", icon: Users, action: () => navigate("/membros") },
+        { title: "Células", icon: HomeIcon, action: () => navigate("/celulas") },
+        { title: "Ministérios", icon: Folder, action: () => alert("Em breve") },
+        { title: "Inventário", icon: Package, action: () => alert("Em breve") },
+        { title: "Financeiro", icon: DollarSign, action: () => alert("Em breve") },
+        { title: "Visitantes", icon: UserPlus, action: () => alert("Em breve") },
+        { title: "Dashboard", icon: BarChart3, action: () => alert("Em breve") },
+        { title: "Kids", icon: Baby, action: () => alert("Em breve") },
+        { title: "Eventos", icon: CalendarDays, action: () => alert("Em breve") },
     ];
 
+    const sair = () => {
+        localStorage.removeItem("logado");
+        navigate("/");
+    };
+
     return (
-        <div className="dashboard">
-            <h1>Igreja360</h1>
+        <main className="home-page">
+            <header className="home-header">
+                <div>
+                    <h1>Igreja360</h1>
+                    <p>Gestão simples e organizada para sua igreja</p>
+                </div>
 
-            <div className="grid">
-                {cards.map((card, index) => (
-                    <div key={index} className="card" onClick={card.action}>
-                        <div className="icon">📌</div>
-                        <span>{card.title}</span>
-                    </div>
-                ))}
-            </div>
+                <button className="logout-button" onClick={sair}>
+                    Sair
+                </button>
+            </header>
 
-            <button className="logout" onClick={() => {
-                localStorage.removeItem("logado");
-                navigate("/");
-            }}>
-                Sair
-            </button>
-        </div>
+            <section className="home-grid">
+                {cards.map((card, index) => {
+                    const Icon = card.icon;
+
+                    return (
+                        <button
+                            key={index}
+                            className="home-card"
+                            onClick={card.action}
+                        >
+                            <Icon className="home-card-icon" size={36} />
+                            <span className="home-card-title">{card.title}</span>
+                        </button>
+                    );
+                })}
+            </section>
+        </main>
     );
 }
 
