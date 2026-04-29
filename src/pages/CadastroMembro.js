@@ -1,16 +1,24 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function CadastroMembro() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [cpf, setCpf] = useState("");
 
-    const navigate = useNavigate();
 
     const salvar = async () => {
         if (!nome || !email || !cpf) {
             alert("Preencha todos os campos!");
+            return;
+        }
+
+        if (!validarEmail(email)) {
+            alert("Email inválido");
+            return;
+        }
+
+        if (cpf.length !== 14) {
+            alert("CPF inválido");
             return;
         }
 
@@ -23,17 +31,14 @@ function CadastroMembro() {
                 body: JSON.stringify({ nome, email, cpf })
             });
 
-            if (!response.ok) {
-                const text = await response.text();
+            const text = await response.text();
 
-                if (!response.ok) {
-                    throw new Error(text || "Erro ao salvar");
-                }
+            if (!response.ok) {
+                throw new Error(text);
             }
 
             alert("Membro cadastrado com sucesso!");
 
-            // limpar campos
             setNome("");
             setEmail("");
             setCpf("");
@@ -67,19 +72,31 @@ function CadastroMembro() {
                 <input
                     placeholder="CPF"
                     value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    onChange={(e) => setCpf(formatarCPF(e.target.value))}
+                    maxLength={14}
                 />
             </div>
 
             <div style={{ marginTop: "20px" }}>
-                <button onClick={salvar}>Salvar</button>
+                <button className="primary-button" onClick={salvar}>
+                    Salvar
+                </button>
             </div>
 
-            <div style={{ marginTop: "20px" }}>
-                <button onClick={() => navigate("/")}>Voltar</button>
-            </div>
         </div>
     );
+}
+
+function formatarCPF(valor) {
+    valor = valor.replace(/\D/g, "");
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    return valor;
+}
+
+function validarEmail(email) {
+    return /\S+@\S+\.\S+/.test(email);
 }
 
 export default CadastroMembro;

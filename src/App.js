@@ -1,17 +1,47 @@
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
-import CadastroMembro from "./pages/CadastroMembro";
-import ListaMembros from "./pages/ListaMembros";
+import Membros from "./pages/Membros";
+import Celulas from "./pages/Celulas";
+import "./App.css";
+
+function PrivateRoute({ children }) {
+    const logado = localStorage.getItem("logado");
+
+    return logado ? children : <Navigate to="/" />;
+}
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/cadastro" element={<CadastroMembro />} />
-                <Route path="/lista" element={<ListaMembros />} />
+                <Route path="/" element={<Login />} />
+
+                <Route
+                    path="/home"
+                    element={
+                        <PrivateRoute>
+                            <Home />
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/membros"
+                    element={
+                        <PrivateRoute>
+                            <Membros />
+                        </PrivateRoute>
+                    }
+                />
+            <Route
+                path="/celulas"
+                element={
+                    <PrivateRoute>
+                        <Celulas />
+                    </PrivateRoute>
+                }
+            />
             </Routes>
         </BrowserRouter>
     );

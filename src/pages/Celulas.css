@@ -1,0 +1,41 @@
+.celulas-grid {
+    margin-top: 30px;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.membros-checkbox-list {
+    display: grid;
+    gap: 8px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+.membro-checkbox {
+    background: #334155;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.membro-checkbox input {
+    margin-right: 8px;
+}
+
+.membros-lista {
+    list-style: none;
+    padding: 0;
+}
+
+.membros-lista li {
+    background: #334155;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 8px;
+}

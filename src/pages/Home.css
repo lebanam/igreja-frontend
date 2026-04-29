@@ -1,0 +1,56 @@
+.dashboard {
+    min-height: 100vh;
+    background: #0f172a; /* azul escuro elegante */
+    color: white;
+    text-align: center;
+    padding: 30px;
+}
+
+.dashboard h1 {
+    margin-bottom: 30px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 👈 força 3 colunas */
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr; /* celular = 1 coluna */
+    }
+}
+
+.card {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background: #334155;
+}
+
+.icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.logout {
+    margin-top: 40px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+}

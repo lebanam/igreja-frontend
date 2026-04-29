@@ -1,32 +1,38 @@
 import { useNavigate } from "react-router-dom";
+import "./Home.css";
 
 function Home() {
     const navigate = useNavigate();
 
+    const cards = [
+        { title: "Membros", action: () => navigate("/membros") },
+        { title: "Células", icon: "🏠", action: () => navigate("/celulas") },
+        { title: "Ministérios", action: () => alert("Em breve") },
+        { title: "Inventário", action: () => alert("Em breve") },
+        { title: "Financeiro", action: () => alert("Em breve") },
+        { title: "Visitantes", action: () => alert("Em breve") },
+        { title: "Dashboard", action: () => alert("Em breve") },
+    ];
+
     return (
-        <div style={{ padding: "40px" }}>
-            <h1>Sistema Igreja</h1>
+        <div className="dashboard">
+            <h1>Igreja360</h1>
 
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "20px",
-                marginTop: "30px"
-            }}>
-
-                <div className="card" onClick={() => navigate("/cadastro")}>
-                    Cadastro de Membros
-                </div>
-
-                <div className="card" onClick={() => navigate("/lista")}>
-                    Consultar Membros
-                </div>
-
-                <div className="card">Status</div>
-                <div className="card">Histórico</div>
-                <div className="card">Relatórios</div>
-
+            <div className="grid">
+                {cards.map((card, index) => (
+                    <div key={index} className="card" onClick={card.action}>
+                        <div className="icon">📌</div>
+                        <span>{card.title}</span>
+                    </div>
+                ))}
             </div>
+
+            <button className="logout" onClick={() => {
+                localStorage.removeItem("logado");
+                navigate("/");
+            }}>
+                Sair
+            </button>
         </div>
     );
 }
