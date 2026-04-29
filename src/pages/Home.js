@@ -12,6 +12,8 @@ function Home() {
         { title: "Financeiro", action: () => alert("Em breve") },
         { title: "Visitantes", action: () => alert("Em breve") },
         { title: "Dashboard", action: () => alert("Em breve") },
+        { title: "Kids", action: () => alert("Em breve") },
+        { title: "Eventos", action: () => alert("Em breve") },
     ];
 
     return (

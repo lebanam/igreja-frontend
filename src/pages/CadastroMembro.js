@@ -1,14 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { API_URL } from "../config/api";
+import { formatarCPF, formatarTelefone } from "../utils/formatadores";
+import { validarEmail, validarCPF } from "../utils/validadores";
 
 function CadastroMembro() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [cpf, setCpf] = useState("");
+    const [telefone, setTelefone] = useState("");
+    const [batizado, setBatizado] = useState(false);
+    const [membroDesde, setMembroDesde] = useState("");
+    const [gcId, setGcId] = useState("");
+    const [voluntario, setVoluntario] = useState(false);
+    const [celulas, setCelulas] = useState([]);
 
+    useEffect(() => {
+        carregarCelulas();
+    }, []);
+
+    const carregarCelulas = async () => {
+        try {
+            const response = await fetch(`${API_URL}/celulas`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
+
+            const data = await response.json();
+            setCelulas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            alert(error.message);
+            setCelulas([]);
+        }
+    };
+
+    const limparFormulario = () => {
+        setNome("");
+        setEmail("");
+        setCpf("");
+        setTelefone("");
+        setBatizado(false);
+        setMembroDesde("");
+        setGcId("");
+        setVoluntario(false);
+    };
 
     const salvar = async () => {
         if (!nome || !email || !cpf) {
-            alert("Preencha todos os campos!");
+            alert("Preencha nome, email e CPF!");
             return;
         }
 
@@ -17,31 +56,37 @@ function CadastroMembro() {
             return;
         }
 
-        if (cpf.length !== 14) {
+        if (!validarCPF(cpf)) {
             alert("CPF inválido");
             return;
         }
 
         try {
-            const response = await fetch("https://igreja-backend-eyfg.onrender.com/membros", {
+            const response = await fetch(`${API_URL}/membros`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ nome, email, cpf })
+                body: JSON.stringify({
+                    nome,
+                    email,
+                    cpf,
+                    telefone,
+                    batizado,
+                    membroDesde: membroDesde || null,
+                    gcId: gcId ? Number(gcId) : null,
+                    voluntario
+                })
             });
 
             const text = await response.text();
 
             if (!response.ok) {
-                throw new Error(text);
+                throw new Error(text || "Erro ao salvar membro");
             }
 
             alert("Membro cadastrado com sucesso!");
-
-            setNome("");
-            setEmail("");
-            setCpf("");
+            limparFormulario();
 
         } catch (error) {
             alert(error.message);
@@ -77,26 +122,66 @@ function CadastroMembro() {
                 />
             </div>
 
+            <div style={{ marginTop: "10px" }}>
+                <input
+                    placeholder="Telefone"
+                    value={telefone}
+                    maxLength={15}
+                    onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+                />
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={batizado}
+                        onChange={(e) => setBatizado(e.target.checked)}
+                    />
+                    Batizado
+                </label>
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+                <label>
+                    Membro desde:
+                    <input
+                        type="date"
+                        value={membroDesde}
+                        onChange={(e) => setMembroDesde(e.target.value)}
+                    />
+                </label>
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+                <select value={gcId} onChange={(e) => setGcId(e.target.value)}>
+                    <option value="">Selecione uma célula</option>
+                    {celulas.map((c) => (
+                        <option key={c.id} value={c.id}>
+                            {c.nome}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div style={{ marginTop: "10px" }}>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={voluntario}
+                        onChange={(e) => setVoluntario(e.target.checked)}
+                    />
+                    Voluntário
+                </label>
+            </div>
+
             <div style={{ marginTop: "20px" }}>
                 <button className="primary-button" onClick={salvar}>
                     Salvar
                 </button>
             </div>
-
         </div>
     );
-}
-
-function formatarCPF(valor) {
-    valor = valor.replace(/\D/g, "");
-    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-    valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    return valor;
-}
-
-function validarEmail(email) {
-    return /\S+@\S+\.\S+/.test(email);
 }
 
 export default CadastroMembro;

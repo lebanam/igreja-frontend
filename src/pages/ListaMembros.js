@@ -1,28 +1,30 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../config/api";
+import { formatarCPF, formatarTelefone } from "../utils/formatadores";
+import { validarEmail, validarCPF } from "../utils/validadores";
 
 function ListaMembros() {
     const [membros, setMembros] = useState([]);
+    const [celulas, setCelulas] = useState([]);
 
     const [membroEditando, setMembroEditando] = useState(null);
     const [nomeEdit, setNomeEdit] = useState("");
     const [emailEdit, setEmailEdit] = useState("");
     const [cpfEdit, setCpfEdit] = useState("");
+    const [telefoneEdit, setTelefoneEdit] = useState("");
+    const [batizadoEdit, setBatizadoEdit] = useState(false);
+    const [membroDesdeEdit, setMembroDesdeEdit] = useState("");
+    const [gcIdEdit, setGcIdEdit] = useState("");
+    const [voluntarioEdit, setVoluntarioEdit] = useState(false);
 
-    function formatarCPF(valor) {
-        valor = valor.replace(/\D/g, "");
-        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-        valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-        valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        return valor;
-    }
-
-    function validarEmail(email) {
-        return /\S+@\S+\.\S+/.test(email);
-    }
+    useEffect(() => {
+        carregarMembros();
+        carregarCelulas();
+    }, []);
 
     const carregarMembros = async () => {
         try {
-            const response = await fetch("https://igreja-backend-eyfg.onrender.com/membros");
+            const response = await fetch(`${API_URL}/membros`);
 
             if (!response.ok) {
                 throw new Error("Erro ao carregar membros");
@@ -31,21 +33,37 @@ function ListaMembros() {
             const data = await response.json();
             setMembros(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error(error);
-            alert("Erro ao carregar membros");
+            alert(error.message);
             setMembros([]);
         }
     };
 
-    useEffect(() => {
-        carregarMembros();
-    }, []);
+    const carregarCelulas = async () => {
+        try {
+            const response = await fetch(`${API_URL}/celulas`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
+
+            const data = await response.json();
+            setCelulas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            alert(error.message);
+            setCelulas([]);
+        }
+    };
 
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
-        setNomeEdit(membro.nome);
-        setEmailEdit(membro.email);
-        setCpfEdit(membro.cpf);
+        setNomeEdit(membro.nome || "");
+        setEmailEdit(membro.email || "");
+        setCpfEdit(membro.cpf || "");
+        setTelefoneEdit(membro.telefone || "");
+        setBatizadoEdit(Boolean(membro.batizado));
+        setMembroDesdeEdit(membro.membroDesde || "");
+        setGcIdEdit(membro.gc?.id ? String(membro.gc.id) : "");
+        setVoluntarioEdit(Boolean(membro.voluntario));
     };
 
     const cancelarEdicao = () => {
@@ -53,11 +71,16 @@ function ListaMembros() {
         setNomeEdit("");
         setEmailEdit("");
         setCpfEdit("");
+        setTelefoneEdit("");
+        setBatizadoEdit(false);
+        setMembroDesdeEdit("");
+        setGcIdEdit("");
+        setVoluntarioEdit(false);
     };
 
     const salvarEdicao = async () => {
         if (!nomeEdit || !emailEdit || !cpfEdit) {
-            alert("Todos os campos são obrigatórios");
+            alert("Preencha nome, email e CPF!");
             return;
         }
 
@@ -66,26 +89,28 @@ function ListaMembros() {
             return;
         }
 
-        if (cpfEdit.length !== 14) {
+        if (!validarCPF(cpfEdit)) {
             alert("CPF inválido");
             return;
         }
 
         try {
-            const response = await fetch(
-                `https://igreja-backend-eyfg.onrender.com/membros/${membroEditando.id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        nome: nomeEdit,
-                        email: emailEdit,
-                        cpf: cpfEdit
-                    })
-                }
-            );
+            const response = await fetch(`${API_URL}/membros/${membroEditando.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nome: nomeEdit,
+                    email: emailEdit,
+                    cpf: cpfEdit,
+                    telefone: telefoneEdit,
+                    batizado: batizadoEdit,
+                    membroDesde: membroDesdeEdit || null,
+                    gcId: gcIdEdit ? Number(gcIdEdit) : null,
+                    voluntario: voluntarioEdit
+                })
+            });
 
             const text = await response.text();
 
@@ -107,7 +132,7 @@ function ListaMembros() {
         if (!confirmar) return;
 
         try {
-            const response = await fetch(`https://igreja-backend-eyfg.onrender.com/membros/${id}`, {
+            const response = await fetch(`${API_URL}/membros/${id}`, {
                 method: "DELETE"
             });
 
@@ -148,7 +173,50 @@ function ListaMembros() {
                         onChange={(e) => setCpfEdit(formatarCPF(e.target.value))}
                     />
 
-                    <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                    <input
+                        placeholder="Telefone"
+                        value={telefoneEdit}
+                        maxLength={15}
+                        onChange={(e) => setTelefoneEdit(formatarTelefone(e.target.value))}
+                    />
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={batizadoEdit}
+                            onChange={(e) => setBatizadoEdit(e.target.checked)}
+                        />
+                        Batizado
+                    </label>
+
+                    <label>
+                        Membro desde:
+                        <input
+                            type="date"
+                            value={membroDesdeEdit}
+                            onChange={(e) => setMembroDesdeEdit(e.target.value)}
+                        />
+                    </label>
+
+                    <select value={gcIdEdit} onChange={(e) => setGcIdEdit(e.target.value)}>
+                        <option value="">Selecione uma célula</option>
+                        {celulas.map((c) => (
+                            <option key={c.id} value={c.id}>
+                                {c.nome}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={voluntarioEdit}
+                            onChange={(e) => setVoluntarioEdit(e.target.checked)}
+                        />
+                        Voluntário
+                    </label>
+
+                    <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "15px" }}>
                         <button className="primary-button" onClick={salvarEdicao}>
                             Salvar alterações
                         </button>
@@ -167,6 +235,11 @@ function ListaMembros() {
                     <th style={thStyle}>Nome</th>
                     <th style={thStyle}>Email</th>
                     <th style={thStyle}>CPF</th>
+                    <th style={thStyle}>Telefone</th>
+                    <th style={thStyle}>Batizado</th>
+                    <th style={thStyle}>Membro desde</th>
+                    <th style={thStyle}>GC</th>
+                    <th style={thStyle}>Voluntário</th>
                     <th style={thStyle}>Ações</th>
                 </tr>
                 </thead>
@@ -178,6 +251,11 @@ function ListaMembros() {
                         <td style={tdStyle}>{m.nome}</td>
                         <td style={tdStyle}>{m.email}</td>
                         <td style={tdStyle}>{m.cpf}</td>
+                        <td style={tdStyle}>{m.telefone || "-"}</td>
+                        <td style={tdStyle}>{m.batizado ? "Sim" : "Não"}</td>
+                        <td style={tdStyle}>{m.membroDesde || "-"}</td>
+                        <td style={tdStyle}>{m.gc?.nome || "-"}</td>
+                        <td style={tdStyle}>{m.voluntario ? "Sim" : "Não"}</td>
                         <td style={tdStyle}>
                             <div style={{ display: "flex", gap: "8px" }}>
                                 <button className="secondary-button" onClick={() => iniciarEdicao(m)}>

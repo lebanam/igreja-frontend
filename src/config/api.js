@@ -1,0 +1,1 @@
+export const API_URL = "https://igreja-backend-eyfg.onrender.com";
