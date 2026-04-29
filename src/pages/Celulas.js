@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+me retorne o codigo com as alterações:
+
+    import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Home } from "lucide-react";
 import "./Celulas.css";
@@ -21,8 +23,6 @@ function Celulas() {
     const [coLider, setCoLider] = useState("");
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
 
-    const [buscaMembro, setBuscaMembro] = useState("");
-
     useEffect(() => {
         carregarMembros();
         carregarCelulas();
@@ -31,7 +31,10 @@ function Celulas() {
     const carregarMembros = async () => {
         try {
             const response = await fetch(`${API_URL}/membros`);
-            if (!response.ok) throw new Error("Erro ao carregar membros");
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar membros");
+            }
 
             const data = await response.json();
             setMembros(Array.isArray(data) ? data : []);
@@ -44,7 +47,10 @@ function Celulas() {
     const carregarCelulas = async () => {
         try {
             const response = await fetch(`${API_URL}/celulas`);
-            if (!response.ok) throw new Error("Erro ao carregar células");
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
 
             const data = await response.json();
             setCelulas(Array.isArray(data) ? data : []);
@@ -54,11 +60,6 @@ function Celulas() {
         }
     };
 
-    const membrosFiltrados = membros.filter((m) =>
-        m.nome.toLowerCase().includes(buscaMembro.toLowerCase()) ||
-        m.email?.toLowerCase().includes(buscaMembro.toLowerCase())
-    );
-
     const limparFormulario = () => {
         setNome("");
         setTema("");
@@ -67,7 +68,6 @@ function Celulas() {
         setLider("");
         setCoLider("");
         setMembrosSelecionados([]);
-        setBuscaMembro("");
         setCelulaSelecionada(null);
         setModoFormulario(false);
     };
@@ -95,7 +95,9 @@ function Celulas() {
 
             const response = await fetch(url, {
                 method: celulaSelecionada ? "PUT" : "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(dados)
             });
 
@@ -130,14 +132,17 @@ function Celulas() {
     };
 
     const excluirCelula = async (id) => {
-        if (!window.confirm("Deseja excluir esta célula?")) return;
+        const confirmar = window.confirm("Deseja excluir esta célula?");
+        if (!confirmar) return;
 
         try {
             const response = await fetch(`${API_URL}/celulas/${id}`, {
                 method: "DELETE"
             });
 
-            if (!response.ok) throw new Error("Erro ao excluir célula");
+            if (!response.ok) {
+                throw new Error("Erro ao excluir célula");
+            }
 
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
@@ -171,28 +176,49 @@ function Celulas() {
                 <div className="form-card">
                     <h2>{celulaSelecionada ? "Editar Célula" : "Cadastrar Célula"}</h2>
 
-                    <input placeholder="Nome da célula" value={nome} onChange={(e) => setNome(e.target.value)} />
-                    <input placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
-                    <input placeholder="Quando" value={quando} onChange={(e) => setQuando(e.target.value)} />
-                    <input placeholder="Onde" value={onde} onChange={(e) => setOnde(e.target.value)} />
-                    <input placeholder="Líder" value={lider} onChange={(e) => setLider(e.target.value)} />
-                    <input placeholder="Co-líder" value={coLider} onChange={(e) => setCoLider(e.target.value)} />
+                    <input
+                        placeholder="Nome da célula"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Tema"
+                        value={tema}
+                        onChange={(e) => setTema(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Quando"
+                        value={quando}
+                        onChange={(e) => setQuando(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Onde"
+                        value={onde}
+                        onChange={(e) => setOnde(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Líder"
+                        value={lider}
+                        onChange={(e) => setLider(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Co-líder"
+                        value={coLider}
+                        onChange={(e) => setCoLider(e.target.value)}
+                    />
 
                     <h3>Membros</h3>
 
-                    <input
-                        placeholder="Pesquisar membro..."
-                        value={buscaMembro}
-                        onChange={(e) => setBuscaMembro(e.target.value)}
-                    />
-
-                    <p>{membrosSelecionados.length} selecionado(s)</p>
-
-                    {membrosFiltrados.length === 0 ? (
-                        <p>Nenhum membro encontrado.</p>
+                    {membros.length === 0 ? (
+                        <p>Nenhum membro cadastrado ainda.</p>
                     ) : (
                         <div className="membros-checkbox-list">
-                            {membrosFiltrados.map((m) => (
+                            {membros.map((m) => (
                                 <label key={m.id} className="membro-checkbox">
                                     <input
                                         type="checkbox"
@@ -219,7 +245,11 @@ function Celulas() {
 
             <div className="card-grid celulas-grid">
                 {celulas.map((celula) => (
-                    <div key={celula.id} className="menu-card" onClick={() => setCelulaSelecionada(celula)}>
+                    <div
+                        key={celula.id}
+                        className="menu-card"
+                        onClick={() => setCelulaSelecionada(celula)}
+                    >
                         <div className="menu-icon">
                             <Home size={28} />
                         </div>
@@ -251,6 +281,20 @@ function Celulas() {
                             ))}
                         </ul>
                     )}
+
+                    <div className="button-row">
+                        <button className="secondary-button" onClick={() => editarCelula(celulaSelecionada)}>
+                            Editar
+                        </button>
+
+                        <button className="danger-button" onClick={() => excluirCelula(celulaSelecionada.id)}>
+                            Excluir
+                        </button>
+
+                        <button className="secondary-button" onClick={() => setCelulaSelecionada(null)}>
+                            Fechar
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
