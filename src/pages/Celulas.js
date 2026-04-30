@@ -1,18 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Home } from "lucide-react";
 import "./Celulas.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
 
 function Celulas() {
     const navigate = useNavigate();
+
     const [celulas, setCelulas] = useState([]);
     const [membros, setMembros] = useState([]);
     const [modoFormulario, setModoFormulario] = useState(false);
     const [celulaSelecionada, setCelulaSelecionada] = useState(null);
 
     const [nome, setNome] = useState("");
-    const [faixaEtaria, setFaixaEtaria] = useState("");
+    const [tema, setTema] = useState("");
+    const [quando, setQuando] = useState("");
+    const [onde, setOnde] = useState("");
     const [lider, setLider] = useState("");
     const [coLider, setCoLider] = useState("");
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
@@ -56,7 +60,9 @@ function Celulas() {
 
     const limparFormulario = () => {
         setNome("");
-        setFaixaEtaria("");
+        setTema("");
+        setQuando("");
+        setOnde("");
         setLider("");
         setCoLider("");
         setMembrosSelecionados([]);
@@ -65,14 +71,16 @@ function Celulas() {
     };
 
     const salvarCelula = async () => {
-        if (!nome || !faixaEtaria || !lider) {
-            alert("Preencha nome, faixa etária e líder");
+        if (!nome || !tema || !quando || !onde || !lider) {
+            alert("Preencha nome, tema, quando, onde e líder");
             return;
         }
 
         const dados = {
             nome,
-            faixaEtaria,
+            tema,
+            quando,
+            onde,
             lider,
             coLider,
             membrosIds: membrosSelecionados.map((id) => Number(id))
@@ -100,7 +108,6 @@ function Celulas() {
             alert("Célula salva com sucesso!");
             limparFormulario();
             carregarCelulas();
-
         } catch (error) {
             alert(error.message);
         }
@@ -108,9 +115,11 @@ function Celulas() {
 
     const editarCelula = (celula) => {
         setCelulaSelecionada(celula);
-        setNome(celula.nome);
-        setFaixaEtaria(celula.faixaEtaria);
-        setLider(celula.lider);
+        setNome(celula.nome || "");
+        setTema(celula.tema || "");
+        setQuando(celula.quando || "");
+        setOnde(celula.onde || "");
+        setLider(celula.lider || "");
         setCoLider(celula.coLider || "");
         setMembrosSelecionados(
             Array.isArray(celula.membros)
@@ -136,7 +145,6 @@ function Celulas() {
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
             carregarCelulas();
-
         } catch (error) {
             alert(error.message);
         }
@@ -173,9 +181,21 @@ function Celulas() {
                     />
 
                     <input
-                        placeholder="Faixa etária"
-                        value={faixaEtaria}
-                        onChange={(e) => setFaixaEtaria(e.target.value)}
+                        placeholder="Tema"
+                        value={tema}
+                        onChange={(e) => setTema(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Quando"
+                        value={quando}
+                        onChange={(e) => setQuando(e.target.value)}
+                    />
+
+                    <input
+                        placeholder="Onde"
+                        value={onde}
+                        onChange={(e) => setOnde(e.target.value)}
                     />
 
                     <input
@@ -228,9 +248,11 @@ function Celulas() {
                         className="menu-card"
                         onClick={() => setCelulaSelecionada(celula)}
                     >
-                        <div className="menu-icon">🏠</div>
+                        <div className="menu-icon">
+                            <Home size={28} />
+                        </div>
                         <strong>{celula.nome}</strong>
-                        <p>{celula.faixaEtaria}</p>
+                        <p>{celula.tema}</p>
                         <small>{celula.membros?.length || 0} membro(s)</small>
                     </div>
                 ))}
@@ -239,8 +261,11 @@ function Celulas() {
             {celulaSelecionada && !modoFormulario && (
                 <div className="form-card">
                     <h2>{celulaSelecionada.nome}</h2>
-                    <p><strong>Faixa etária:</strong> {celulaSelecionada.faixaEtaria}</p>
-                    <p><strong>Líder:</strong> {celulaSelecionada.lider}</p>
+
+                    <p><strong>Tema:</strong> {celulaSelecionada.tema || "Não informado"}</p>
+                    <p><strong>Quando:</strong> {celulaSelecionada.quando || "Não informado"}</p>
+                    <p><strong>Onde:</strong> {celulaSelecionada.onde || "Não informado"}</p>
+                    <p><strong>Líder:</strong> {celulaSelecionada.lider || "Não informado"}</p>
                     <p><strong>Co-líder:</strong> {celulaSelecionada.coLider || "Não informado"}</p>
 
                     <h3>Membros</h3>
