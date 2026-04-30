@@ -2,16 +2,24 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CadastroMembro from "./CadastroMembro";
 import ListaMembros from "./ListaMembros";
+import { UserPlus, List } from "lucide-react";
 
 function Membros() {
     const navigate = useNavigate();
     const [tela, setTela] = useState(null);
 
     return (
-        <div className="page">
-            <button className="back-button" onClick={() => navigate("/home")}>
-                Início
+        <div className="page-header">
+            <h1>
+                <List size={20} />
+                Lista de Membros
+            </h1>
+
+            <button className="btn btn-primary" onClick={abrirFormulario}>
+                <UserPlus size={18} />
+                Cadastrar Membro
             </button>
+
 
             <h1 className="page-title">Membros</h1>
 
