@@ -17,20 +17,46 @@
     text-align: left;
 }
 
+.membros-checkbox-list {
+    display: grid;
+    gap: 8px;
+    margin: 16px 0;
+    text-align: left;
+}
+
 .membro-checkbox {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 10px;
 
+    width: 100%;
     background: var(--bg-card-hover);
-    padding: 10px;
+    padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
-
 .membro-checkbox input {
+    width: auto;
+    height: auto;
     margin: 0;
+    flex: 0 0 auto;
+}
+
+.membro-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-align: left;
+    flex: 1;
+}
+
+.membro-aviso {
+    color: var(--warning-color);
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 .membros-lista {
@@ -45,9 +71,4 @@
     border-radius: 8px;
 }
 
-.membro-aviso {
-    color: var(--warning-color);
-    font-size: 0.8rem;
-    font-weight: 500;
-}
 
