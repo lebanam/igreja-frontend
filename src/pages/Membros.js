@@ -18,12 +18,8 @@ function Membros() {
             {!tela && (
                 <>
                     {/* BOTÃO INÍCIO */}
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => navigate("/")}
-                    >
-                        <Home size={18} />
-                        Início
+                    <button className="back-button" onClick={() => navigate("/home")}>
+                       Início
                     </button>
 
                     <div className="card-grid">
