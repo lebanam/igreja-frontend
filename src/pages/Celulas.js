@@ -22,9 +22,12 @@ function Celulas() {
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
 
     useEffect(() => {
-        carregarMembros();
-        carregarCelulas();
+        carregarDados();
     }, []);
+
+    const carregarDados = async () => {
+        await Promise.all([carregarMembros(), carregarCelulas()]);
+    };
 
     const carregarMembros = async () => {
         try {
@@ -70,28 +73,19 @@ function Celulas() {
         setModoFormulario(false);
     };
 
-    const atualizarMembro = async (membro, celulaId) => {
-        const response = await fetch(`${API_URL}/membros/${membro.id}`, {
-            method: "PUT",
+    const atualizarCelulaDoMembro = async (membroId, celulaId) => {
+        const response = await fetch(`${API_URL}/membros/${membroId}/celula`, {
+            method: "PATCH",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                nome: membro.nome,
-                email: membro.email,
-                cpf: membro.cpf,
-                telefone: membro.telefone,
-                batizado: membro.batizado,
-                membroDesde: membro.membroDesde || null,
-                voluntario: membro.voluntario,
-                celulaId
-            })
+            body: JSON.stringify({ celulaId })
         });
 
         const text = await response.text();
 
         if (!response.ok) {
-            throw new Error(text || `Erro ao atualizar membro ${membro.nome}`);
+            throw new Error(text || "Erro ao atualizar célula do membro");
         }
     };
 
@@ -99,6 +93,26 @@ function Celulas() {
         if (!nome || !tema || !quando || !onde || !lider) {
             alert("Preencha nome, tema, quando, onde e líder");
             return;
+        }
+
+        const membrosMovidos = membros.filter(
+            (m) =>
+                membrosSelecionados.includes(String(m.id)) &&
+                m.celula &&
+                celulaSelecionada &&
+                m.celula.id !== celulaSelecionada.id
+        );
+
+        if (membrosMovidos.length > 0) {
+            const nomes = membrosMovidos
+                .map((m) => `${m.nome} (${m.celula.nome})`)
+                .join(", ");
+
+            const confirmar = window.confirm(
+                `Os seguintes membros já estão em outra célula e serão movidos para esta célula: ${nomes}. Deseja continuar?`
+            );
+
+            if (!confirmar) return;
         }
 
         const dados = {
@@ -132,7 +146,7 @@ function Celulas() {
             const celulaSalva = JSON.parse(text);
             const celulaId = celulaSalva.id;
 
-            const membrosDaCelulaAntes = membros.filter(
+            const membrosAtuaisDaCelula = membros.filter(
                 (m) => m.celula?.id === celulaId
             );
 
@@ -140,19 +154,22 @@ function Celulas() {
                 membrosSelecionados.includes(String(m.id))
             );
 
-            const membrosParaRemover = membrosDaCelulaAntes.filter(
+            const membrosParaRemover = membrosAtuaisDaCelula.filter(
                 (m) => !membrosSelecionados.includes(String(m.id))
             );
 
             await Promise.all([
-                ...membrosParaAdicionar.map((m) => atualizarMembro(m, celulaId)),
-                ...membrosParaRemover.map((m) => atualizarMembro(m, null))
+                ...membrosParaAdicionar.map((m) =>
+                    atualizarCelulaDoMembro(m.id, celulaId)
+                ),
+                ...membrosParaRemover.map((m) =>
+                    atualizarCelulaDoMembro(m.id, null)
+                )
             ]);
 
             alert("Célula salva com sucesso!");
             limparFormulario();
-            carregarCelulas();
-            carregarMembros();
+            carregarDados();
         } catch (error) {
             alert(error.message);
         }
@@ -166,11 +183,13 @@ function Celulas() {
         setOnde(celula.onde || "");
         setLider(celula.lider || "");
         setCoLider(celula.coLider || "");
+
         setMembrosSelecionados(
             Array.isArray(celula.membros)
                 ? celula.membros.map((m) => String(m.id))
                 : []
         );
+
         setModoFormulario(true);
     };
 
@@ -179,35 +198,29 @@ function Celulas() {
         if (!confirmar) return;
 
         try {
-            const membrosDaCelula = membros.filter((m) => m.celula?.id === id);
-
-            await Promise.all(
-                membrosDaCelula.map((m) => atualizarMembro(m, null))
-            );
-
             const response = await fetch(`${API_URL}/celulas/${id}`, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
-                throw new Error("Erro ao excluir célula");
+                const text = await response.text();
+                throw new Error(text || "Erro ao excluir célula");
             }
 
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
-            carregarCelulas();
-            carregarMembros();
+            carregarDados();
         } catch (error) {
             alert(error.message);
         }
     };
 
     const selecionarMembro = (id) => {
-        if (membrosSelecionados.includes(id)) {
-            setMembrosSelecionados(membrosSelecionados.filter((m) => m !== id));
-        } else {
-            setMembrosSelecionados([...membrosSelecionados, id]);
-        }
+        setMembrosSelecionados((selecionados) =>
+            selecionados.includes(id)
+                ? selecionados.filter((m) => m !== id)
+                : [...selecionados, id]
+        );
     };
 
     return (
@@ -226,41 +239,12 @@ function Celulas() {
                 <div className="form-card">
                     <h2>{celulaSelecionada ? "Editar Célula" : "Cadastrar Célula"}</h2>
 
-                    <input
-                        placeholder="Nome da célula"
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Tema"
-                        value={tema}
-                        onChange={(e) => setTema(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Quando"
-                        value={quando}
-                        onChange={(e) => setQuando(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Onde"
-                        value={onde}
-                        onChange={(e) => setOnde(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Líder"
-                        value={lider}
-                        onChange={(e) => setLider(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Co-líder"
-                        value={coLider}
-                        onChange={(e) => setCoLider(e.target.value)}
-                    />
+                    <input placeholder="Nome da célula" value={nome} onChange={(e) => setNome(e.target.value)} />
+                    <input placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
+                    <input placeholder="Quando" value={quando} onChange={(e) => setQuando(e.target.value)} />
+                    <input placeholder="Onde" value={onde} onChange={(e) => setOnde(e.target.value)} />
+                    <input placeholder="Líder" value={lider} onChange={(e) => setLider(e.target.value)} />
+                    <input placeholder="Co-líder" value={coLider} onChange={(e) => setCoLider(e.target.value)} />
 
                     <h3>Membros</h3>
 
@@ -283,14 +267,13 @@ function Celulas() {
                                         />
 
                                         <span>
-                    {m.nome}
-
+                                            {m.nome}
                                             {estaEmOutraCelula && (
                                                 <small className="membro-aviso">
                                                     {" "}— será movido de {m.celula.nome}
                                                 </small>
                                             )}
-                </span>
+                                        </span>
                                     </label>
                                 );
                             })}
@@ -349,24 +332,15 @@ function Celulas() {
                     )}
 
                     <div className="button-row">
-                        <button
-                            className="secondary-button"
-                            onClick={() => editarCelula(celulaSelecionada)}
-                        >
+                        <button className="secondary-button" onClick={() => editarCelula(celulaSelecionada)}>
                             Editar
                         </button>
 
-                        <button
-                            className="danger-button"
-                            onClick={() => excluirCelula(celulaSelecionada.id)}
-                        >
+                        <button className="danger-button" onClick={() => excluirCelula(celulaSelecionada.id)}>
                             Excluir
                         </button>
 
-                        <button
-                            className="secondary-button"
-                            onClick={() => setCelulaSelecionada(null)}
-                        >
+                        <button className="secondary-button" onClick={() => setCelulaSelecionada(null)}>
                             Fechar
                         </button>
                     </div>
