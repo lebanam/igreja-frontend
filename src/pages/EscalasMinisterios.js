@@ -22,9 +22,6 @@ function EscalasMinisterio() {
     const [textoEscala, setTextoEscala] = useState("");
     const [observacoes, setObservacoes] = useState("");
 
-    useEffect(() => {
-        carregarEscalas();
-    }, [carregarEscalas]);
 
     const carregarEscalas = useCallback(async () => {
         try {
@@ -42,6 +39,10 @@ function EscalasMinisterio() {
         }
     }, [ministerioId]);
 
+    useEffect(() => {
+        carregarEscalas();
+    }, [carregarEscalas]);
+    
     const limparFormulario = () => {
         setData("");
         setHorario("");
