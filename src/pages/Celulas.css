@@ -63,3 +63,27 @@
     padding: 10px;
     border-radius: 8px;
 }
+
+.relatorio-mes {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.relatorio-mes-header {
+    width: 100%;
+    border: none;
+    background: var(--bg-secondary);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+
+.relatorio-mes-detalhe {
+    padding: 16px;
+}

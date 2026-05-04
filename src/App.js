@@ -5,6 +5,9 @@ import Membros from "./pages/Membros";
 import Celulas from "./pages/Celulas";
 import Ministerios from "./pages/Ministerios";
 import EscalasMinisterios from "./pages/EscalasMinisterios";
+import Financeiro from "./pages/Financeiro";
+import LancamentoFinanceiro from "./pages/LancamentoFinanceiro";
+import RelatorioFinanceiro from "./pages/RelatorioFinanceiro";
 import "./App.css";
 
 function PrivateRoute({ children }) {
@@ -53,6 +56,14 @@ function App() {
                     <PrivateRoute>
                         <EscalasMinisterios />
                     </PrivateRoute> } />
+
+                <Route path="/financeiro" element={
+                    <PrivateRoute>
+                        <Financeiro />
+                    </PrivateRoute> } />
+
+                <Route path="/financeiro/:tipo" element={<LancamentoFinanceiro />} />
+                <Route path="/financeiro/relatorio" element={<RelatorioFinanceiro />} />
             </Routes>
 
             </BrowserRouter>
