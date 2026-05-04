@@ -19,27 +19,18 @@
     background: var(--color-primary);
     color: white;
 }
-
-/* ===== DETALHES DO MEMBRO (tabela expandida) ===== */
-
-.detalhe-row td {
-    padding: 0;
-    background: transparent;
-}
-
 .detalhe-card {
-    margin: 12px 0;
-    padding: 16px;
+    margin: 12px 16px;
+    padding: 20px;
     border-radius: 12px;
-    background: var(--color-bg-secondary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: #1f2a3a;
+    color: #ffffff;
+    border: 1px solid #334155;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
-.detalhe-card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
-}
-
-.detalhe-card p {
-    margin: 4px 0;
+.detalhe-card h3,
+.detalhe-card p,
+.detalhe-card strong {
+    color: #ffffff;
 }
