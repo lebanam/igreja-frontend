@@ -21,7 +21,6 @@ function EscalasMinisterio() {
     const [data, setData] = useState("");
     const [horario, setHorario] = useState("");
     const [titulo, setTitulo] = useState("");
-    const [textoEscala, setTextoEscala] = useState("");
     const [observacoes, setObservacoes] = useState("");
     const [participantes, setParticipantes] = useState([
         { funcao: "", membroId: "" }
@@ -85,7 +84,6 @@ function EscalasMinisterio() {
         setData("");
         setHorario("");
         setTitulo("");
-        setTextoEscala("");
         setObservacoes("");
         setParticipantes([{ funcao: "", membroId: "" }]);
         setEscalaSelecionada(null);
@@ -137,8 +135,8 @@ function EscalasMinisterio() {
             return;
         }
 
-        if (participantesValidos.length === 0 && !textoEscala.trim()) {
-            alert("Adicione pelo menos uma função com membro ou preencha a escala em texto");
+        if (participantesValidos.length === 0) {
+            alert("Adicione pelo menos uma função com membro");
             return;
         }
 
@@ -146,7 +144,7 @@ function EscalasMinisterio() {
             data,
             horario: horario || null,
             titulo,
-            textoEscala,
+            textoEscala: "",
             observacoes,
             ministerioId: Number(ministerioId),
             participantes: participantesValidos
@@ -192,7 +190,6 @@ function EscalasMinisterio() {
         setData(escala.data || "");
         setHorario(escala.horario || "");
         setTitulo(escala.titulo || "");
-        setTextoEscala(escala.textoEscala || "");
         setObservacoes(escala.observacoes || "");
         setParticipantes(participantesEditaveis);
         setModoFormulario(true);
@@ -242,15 +239,18 @@ function EscalasMinisterio() {
                 Escalas {ministerio?.nome ? `- ${ministerio.nome}` : ""}
             </h1>
 
-            <button className="primary-button" onClick={() => setModoFormulario(true)}>
-                Nova Escala
-            </button>
+            <div className="button-row">
+                <button className="primary-button" onClick={() => setModoFormulario(true)}>
+                    Nova Escala
+                </button>
 
-            <input
-                placeholder="Buscar membro escalado..."
-                value={buscaMembro}
-                onChange={(e) => setBuscaMembro(e.target.value)}
-            />
+                <input
+                    className="search-input"
+                    placeholder="Buscar membro escalado..."
+                    value={buscaMembro}
+                    onChange={(e) => setBuscaMembro(e.target.value)}
+                />
+            </div>
 
             {modoFormulario && (
                 <div className="form-card">
@@ -319,12 +319,6 @@ function EscalasMinisterio() {
                     </button>
 
                     <textarea
-                        placeholder="Escala em texto livre (opcional durante a transição)"
-                        value={textoEscala}
-                        onChange={(e) => setTextoEscala(e.target.value)}
-                    />
-
-                    <textarea
                         placeholder="Observações"
                         value={observacoes}
                         onChange={(e) => setObservacoes(e.target.value)}
@@ -381,20 +375,14 @@ function EscalasMinisterio() {
 
                     <h3>Escala</h3>
 
-                    {escalaSelecionada.participantes?.length > 0 ? (
-                        <ul className="membros-lista">
-                            {escalaSelecionada.participantes.map((participante, index) => (
-                                <li key={index}>
-                                    <strong>{participante.funcao}</strong> -{" "}
-                                    {participante.membroNome}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <pre className="escala-texto">
-                            {escalaSelecionada.textoEscala || "Não informado"}
-                        </pre>
-                    )}
+                    <ul className="membros-lista">
+                        {escalaSelecionada.participantes?.map((participante, index) => (
+                            <li key={index}>
+                                <strong>{participante.funcao}</strong> -{" "}
+                                {participante.membroNome}
+                            </li>
+                        ))}
+                    </ul>
 
                     <h3>Observações</h3>
                     <p>{escalaSelecionada.observacoes || "Nenhuma observação"}</p>

@@ -87,3 +87,8 @@
 .relatorio-mes-detalhe {
     padding: 16px;
 }
+
+.search-input {
+    max-width: 360px;
+    width: 100%;
+}
