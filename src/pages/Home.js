@@ -18,7 +18,7 @@ function Home() {
     const cards = [
         { title: "Membros", icon: Users, action: () => navigate("/membros") },
         { title: "Células", icon: HomeIcon, action: () => navigate("/celulas") },
-        { title: "Ministérios", icon: Folder, action: () => alert("Em breve") },
+        { title: "Ministérios", icon: Folder, action: () => navigate("/ministerios") },
         { title: "Visitantes", icon: UserPlus, action: () => alert("Em breve") },
         { title: "Financeiro", icon: DollarSign, action: () => alert("Em breve") },
         { title: "Kids", icon: Baby, action: () => alert("Em breve") },

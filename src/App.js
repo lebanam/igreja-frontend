@@ -3,6 +3,8 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Membros from "./pages/Membros";
 import Celulas from "./pages/Celulas";
+import Ministerios from "./pages/Ministerios";
+import EscalasMinisterio from "./pages/EscalasMinisterio";
 import "./App.css";
 
 function PrivateRoute({ children }) {
@@ -42,7 +44,13 @@ function App() {
                     </PrivateRoute>
                 }
             />
+                <Route path="/ministerios" element={
+                    <PrivateRoute>
+                        <Ministerios />
+                    </PrivateRoute> } />
             </Routes>
+
+            <Route path="/ministerios/:ministerioId/escalas" element={<EscalasMinisterio />} />
         </BrowserRouter>
     );
 }
