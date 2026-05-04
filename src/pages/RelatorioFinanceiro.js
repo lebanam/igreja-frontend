@@ -15,6 +15,7 @@ function RelatorioFinanceiro() {
 
     const [lancamentos, setLancamentos] = useState([]);
     const [mesAberto, setMesAberto] = useState(null);
+    const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
 
     const carregarLancamentos = useCallback(async () => {
         try {
@@ -36,6 +37,15 @@ function RelatorioFinanceiro() {
         carregarLancamentos();
     }, [carregarLancamentos]);
 
+    const anosDisponiveis = Array.from(
+        new Set([
+            new Date().getFullYear(),
+            ...lancamentos.map((lancamento) =>
+                new Date(`${lancamento.data}T00:00:00`).getFullYear()
+            )
+        ])
+    ).sort((a, b) => b - a);
+
     const formatarMoeda = (valor) => {
         return Number(valor || 0).toLocaleString("pt-BR", {
             style: "currency",
@@ -46,7 +56,11 @@ function RelatorioFinanceiro() {
     const obterLancamentosDoMes = (mesIndex) => {
         return lancamentos.filter((lancamento) => {
             const data = new Date(`${lancamento.data}T00:00:00`);
-            return data.getMonth() === mesIndex;
+
+            return (
+                data.getMonth() === mesIndex &&
+                data.getFullYear() === anoSelecionado
+            );
         });
     };
 
@@ -73,6 +87,11 @@ function RelatorioFinanceiro() {
         setMesAberto(mesAberto === index ? null : index);
     };
 
+    const alterarAno = (ano) => {
+        setAnoSelecionado(Number(ano));
+        setMesAberto(null);
+    };
+
     return (
         <div className="page">
             <button className="back-button" onClick={() => navigate("/financeiro")}>
@@ -83,6 +102,17 @@ function RelatorioFinanceiro() {
 
             <div className="form-card">
                 <h2>Relatório Mensal</h2>
+
+                <select
+                    value={anoSelecionado}
+                    onChange={(e) => alterarAno(e.target.value)}
+                >
+                    {anosDisponiveis.map((ano) => (
+                        <option key={ano} value={ano}>
+                            {ano}
+                        </option>
+                    ))}
+                </select>
 
                 {meses.map((mes, index) => {
                     const resumo = calcularResumoMes(index);
