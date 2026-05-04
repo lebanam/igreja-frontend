@@ -42,7 +42,7 @@ function EscalasMinisterio() {
     useEffect(() => {
         carregarEscalas();
     }, [carregarEscalas]);
-    
+
     const limparFormulario = () => {
         setData("");
         setHorario("");

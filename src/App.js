@@ -48,10 +48,14 @@ function App() {
                     <PrivateRoute>
                         <Ministerios />
                     </PrivateRoute> } />
+
+                <Route path="/ministerios/:ministerioId/escalas" element={
+                    <PrivateRoute>
+                        <EscalasMinisterios />
+                    </PrivateRoute> } />
             </Routes>
 
-            <Route path="/ministerios/:ministerioId/escalas" element={<EscalasMinisterios />} />
-        </BrowserRouter>
+            </BrowserRouter>
     );
 }
 
