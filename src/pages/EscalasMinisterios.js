@@ -22,6 +22,24 @@ function EscalasMinisterio() {
     const [textoEscala, setTextoEscala] = useState("");
     const [observacoes, setObservacoes] = useState("");
 
+    // ✅ NOVO: formatador de data
+    const formatarData = (data) => {
+        if (!data) return "Não informado";
+
+        const d = new Date(`${data}T00:00:00`);
+
+        const diaSemana = d.toLocaleDateString("pt-BR", {
+            weekday: "long"
+        });
+
+        const dataFormatada = d.toLocaleDateString("pt-BR");
+
+        // Deixa a primeira letra maiúscula (ex: "domingo" → "Domingo")
+        const diaCapitalizado =
+            diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
+
+        return `${diaCapitalizado}, ${dataFormatada}`;
+    };
 
     const carregarEscalas = useCallback(async () => {
         try {
@@ -199,7 +217,7 @@ function EscalasMinisterio() {
                         </div>
 
                         <strong>{escala.titulo}</strong>
-                        <p>{escala.data}</p>
+                        <p>{formatarData(escala.data)}</p>
                         <small>{escala.horario || "Horário não informado"}</small>
                     </div>
                 ))}
@@ -209,7 +227,7 @@ function EscalasMinisterio() {
                 <div className="form-card">
                     <h2>{escalaSelecionada.titulo}</h2>
 
-                    <p><strong>Data:</strong> {escalaSelecionada.data || "Não informado"}</p>
+                    <p><strong>Data:</strong> {formatarData(escalaSelecionada.data)}</p>
                     <p><strong>Horário:</strong> {escalaSelecionada.horario || "Não informado"}</p>
 
                     <h3>Escala</h3>
