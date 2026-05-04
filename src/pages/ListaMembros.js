@@ -12,6 +12,10 @@ function ListaMembros() {
     const [emailEdit, setEmailEdit] = useState("");
     const [cpfEdit, setCpfEdit] = useState("");
     const [telefoneEdit, setTelefoneEdit] = useState("");
+    const [dataNascimentoEdit, setDataNascimentoEdit] = useState("");
+    const [sexoEdit, setSexoEdit] = useState("");
+    const [estadoCivilEdit, setEstadoCivilEdit] = useState("");
+    const [enderecoEdit, setEnderecoEdit] = useState("");
     const [batizadoEdit, setBatizadoEdit] = useState(false);
     const [membroDesdeEdit, setMembroDesdeEdit] = useState("");
     const [celulaIdEdit, setCelulaIdEdit] = useState("");
@@ -55,12 +59,29 @@ function ListaMembros() {
         }
     };
 
+    const formatarData = (data) => {
+        if (!data) return "-";
+        return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
+    };
+
+    const formatarOpcao = (valor) => {
+        if (!valor) return "-";
+
+        const texto = valor.toLowerCase().replace("_", " ");
+
+        return texto.charAt(0).toUpperCase() + texto.slice(1);
+    };
+
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
         setNomeEdit(membro.nome || "");
         setEmailEdit(membro.email || "");
         setCpfEdit(membro.cpf || "");
         setTelefoneEdit(membro.telefone || "");
+        setDataNascimentoEdit(membro.dataNascimento || "");
+        setSexoEdit(membro.sexo || "");
+        setEstadoCivilEdit(membro.estadoCivil || "");
+        setEnderecoEdit(membro.endereco || "");
         setBatizadoEdit(Boolean(membro.batizado));
         setMembroDesdeEdit(membro.membroDesde || "");
         setCelulaIdEdit(membro.celula?.id || "");
@@ -73,6 +94,10 @@ function ListaMembros() {
         setEmailEdit("");
         setCpfEdit("");
         setTelefoneEdit("");
+        setDataNascimentoEdit("");
+        setSexoEdit("");
+        setEstadoCivilEdit("");
+        setEnderecoEdit("");
         setBatizadoEdit(false);
         setMembroDesdeEdit("");
         setCelulaIdEdit("");
@@ -100,6 +125,10 @@ function ListaMembros() {
             email: emailEdit,
             cpf: cpfEdit,
             telefone: telefoneEdit,
+            dataNascimento: dataNascimentoEdit || null,
+            sexo: sexoEdit || null,
+            estadoCivil: estadoCivilEdit || null,
+            endereco: enderecoEdit,
             batizado: batizadoEdit,
             membroDesde: membroDesdeEdit || null,
             celulaId: celulaIdEdit ? Number(celulaIdEdit) : null,
@@ -186,6 +215,39 @@ function ListaMembros() {
                         onChange={(e) => setTelefoneEdit(formatarTelefone(e.target.value))}
                     />
 
+                    <label className="field-label">Data de nascimento:</label>
+                    <input
+                        type="date"
+                        value={dataNascimentoEdit}
+                        onChange={(e) => setDataNascimentoEdit(e.target.value)}
+                    />
+
+                    <select
+                        value={sexoEdit}
+                        onChange={(e) => setSexoEdit(e.target.value)}
+                    >
+                        <option value="">Sexo</option>
+                        <option value="FEMININO">Feminino</option>
+                        <option value="MASCULINO">Masculino</option>
+                    </select>
+
+                    <select
+                        value={estadoCivilEdit}
+                        onChange={(e) => setEstadoCivilEdit(e.target.value)}
+                    >
+                        <option value="">Estado civil</option>
+                        <option value="SOLTEIRO">Solteiro(a)</option>
+                        <option value="CASADO">Casado(a)</option>
+                        <option value="DIVORCIADO">Divorciado(a)</option>
+                        <option value="VIUVO">Viúvo(a)</option>
+                    </select>
+
+                    <textarea
+                        placeholder="Endereço"
+                        value={enderecoEdit}
+                        onChange={(e) => setEnderecoEdit(e.target.value)}
+                    />
+
                     <label className="checkbox-field">
                         <input
                             type="checkbox"
@@ -248,6 +310,9 @@ function ListaMembros() {
                         <th>Email</th>
                         <th>CPF</th>
                         <th>Telefone</th>
+                        <th>Idade</th>
+                        <th>Sexo</th>
+                        <th>Estado civil</th>
                         <th>Batizado</th>
                         <th>Membro desde</th>
                         <th>Célula</th>
@@ -264,8 +329,11 @@ function ListaMembros() {
                             <td>{m.email}</td>
                             <td>{m.cpf}</td>
                             <td>{m.telefone || "-"}</td>
+                            <td>{m.idade ?? "-"}</td>
+                            <td>{formatarOpcao(m.sexo)}</td>
+                            <td>{formatarOpcao(m.estadoCivil)}</td>
                             <td>{m.batizado ? "Sim" : "Não"}</td>
-                            <td>{m.membroDesde || "-"}</td>
+                            <td>{formatarData(m.membroDesde)}</td>
                             <td>{m.celula ? m.celula.nome : "-"}</td>
                             <td>{m.voluntario ? "Sim" : "Não"}</td>
                             <td>

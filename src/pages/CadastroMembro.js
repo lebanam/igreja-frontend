@@ -8,6 +8,10 @@ function CadastroMembro() {
     const [email, setEmail] = useState("");
     const [cpf, setCpf] = useState("");
     const [telefone, setTelefone] = useState("");
+    const [dataNascimento, setDataNascimento] = useState("");
+    const [sexo, setSexo] = useState("");
+    const [estadoCivil, setEstadoCivil] = useState("");
+    const [endereco, setEndereco] = useState("");
     const [batizado, setBatizado] = useState(false);
     const [membroDesde, setMembroDesde] = useState("");
     const [celulaId, setCelulaId] = useState("");
@@ -39,6 +43,10 @@ function CadastroMembro() {
         setEmail("");
         setCpf("");
         setTelefone("");
+        setDataNascimento("");
+        setSexo("");
+        setEstadoCivil("");
+        setEndereco("");
         setBatizado(false);
         setMembroDesde("");
         setCelulaId("");
@@ -66,6 +74,10 @@ function CadastroMembro() {
             email,
             cpf,
             telefone,
+            dataNascimento: dataNascimento || null,
+            sexo: sexo || null,
+            estadoCivil: estadoCivil || null,
+            endereco,
             batizado,
             membroDesde: membroDesde || null,
             celulaId: celulaId ? Number(celulaId) : null,
@@ -124,6 +136,33 @@ function CadastroMembro() {
                 value={telefone}
                 maxLength={15}
                 onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+            />
+
+            <label className="field-label">Data de nascimento:</label>
+            <input
+                type="date"
+                value={dataNascimento}
+                onChange={(e) => setDataNascimento(e.target.value)}
+            />
+
+            <select value={sexo} onChange={(e) => setSexo(e.target.value)}>
+                <option value="">Sexo</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+            </select>
+
+            <select value={estadoCivil} onChange={(e) => setEstadoCivil(e.target.value)}>
+                <option value="">Estado civil</option>
+                <option value="SOLTEIRO">Solteiro(a)</option>
+                <option value="CASADO">Casado(a)</option>
+                <option value="DIVORCIADO">Divorciado(a)</option>
+                <option value="VIUVO">Viúvo(a)</option>
+            </select>
+
+            <textarea
+                placeholder="Endereço"
+                value={endereco}
+                onChange={(e) => setEndereco(e.target.value)}
             />
 
             <label className="checkbox-field">
