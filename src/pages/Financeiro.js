@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DollarSign, TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
 import "./Celulas.css";
 
 function Financeiro() {
