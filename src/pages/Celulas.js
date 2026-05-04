@@ -268,16 +268,32 @@ function Celulas() {
                         <p>Nenhum membro cadastrado ainda.</p>
                     ) : (
                         <div className="membros-checkbox-list">
-                            {membros.map((m) => (
-                                <label key={m.id} className="membro-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={membrosSelecionados.includes(String(m.id))}
-                                        onChange={() => selecionarMembro(String(m.id))}
-                                    />
-                                    {m.nome}
-                                </label>
-                            ))}
+                            {membros.map((m) => {
+                                const estaEmOutraCelula =
+                                    m.celula &&
+                                    celulaSelecionada &&
+                                    m.celula.id !== celulaSelecionada.id;
+
+                                return (
+                                    <label key={m.id} className="membro-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={membrosSelecionados.includes(String(m.id))}
+                                            onChange={() => selecionarMembro(String(m.id))}
+                                        />
+
+                                        <span>
+                    {m.nome}
+
+                                            {estaEmOutraCelula && (
+                                                <small className="membro-aviso">
+                                                    {" "}— será movido de {m.celula.nome}
+                                                </small>
+                                            )}
+                </span>
+                                    </label>
+                                );
+                            })}
                         </div>
                     )}
 

@@ -39,3 +39,9 @@
     padding: 10px;
     border-radius: 8px;
 }
+
+.membro-aviso {
+    color: var(--warning-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
