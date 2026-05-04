@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Membros from "./pages/Membros";
 import Celulas from "./pages/Celulas";
 import Ministerios from "./pages/Ministerios";
-import EscalasMinisterio from "./pages/EscalasMinisterio";
+import EscalasMinisterios from "./pages/EscalasMinisterios";
 import "./App.css";
 
 function PrivateRoute({ children }) {
