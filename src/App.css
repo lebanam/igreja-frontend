@@ -165,3 +165,27 @@
   background: var(--color-danger-hover);
 }
 
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.checkbox-field input {
+  width: auto;
+  height: auto;
+  margin: 0;
+  accent-color: var(--bg-primary);
+}
+
+.field-label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+  font-weight: 600;
+}

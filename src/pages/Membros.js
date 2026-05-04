@@ -1,14 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CadastroMembro from "./CadastroMembro";
 import ListaMembros from "./ListaMembros";
-import { UserPlus, List } from "lucide-react";
+import { UserPlus, List, Home } from "lucide-react";
 
 function Membros() {
     const [tela, setTela] = useState(null);
-
-    const abrirFormulario = () => {
-        setTela("cadastro");
-    };
+    const navigate = useNavigate();
 
     return (
         <div className="page">
@@ -19,9 +17,13 @@ function Membros() {
 
             {!tela && (
                 <>
-                    <button className="btn btn-primary" onClick={abrirFormulario}>
-                        <UserPlus size={18} />
-                        Cadastrar Membro
+                    {/* BOTÃO INÍCIO */}
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => navigate("/")}
+                    >
+                        <Home size={18} />
+                        Início
                     </button>
 
                     <div className="card-grid">

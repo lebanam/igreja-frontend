@@ -127,23 +127,22 @@ function CadastroMembro() {
                 onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
             />
 
-            <label>
+            <label className="checkbox-field">
                 <input
                     type="checkbox"
                     checked={batizado}
                     onChange={(e) => setBatizado(e.target.checked)}
                 />
-                Batizado
+                <span>Batizado</span>
             </label>
 
-            <label>
-                Membro desde:
-                <input
-                    type="date"
-                    value={membroDesde}
-                    onChange={(e) => setMembroDesde(e.target.value)}
-                />
-            </label>
+            <label className="field-label">Membro desde:</label>
+
+            <input
+                type="date"
+                value={membroDesde}
+                onChange={(e) => setMembroDesde(e.target.value)}
+            />
 
             <select value={gc} onChange={(e) => setGc(e.target.value)}>
                 <option value="">Selecione uma célula</option>
@@ -154,13 +153,13 @@ function CadastroMembro() {
                 ))}
             </select>
 
-            <label>
+            <label className="checkbox-field">
                 <input
                     type="checkbox"
                     checked={voluntario}
                     onChange={(e) => setVoluntario(e.target.checked)}
                 />
-                Voluntário
+                <span>Voluntário</span>
             </label>
 
             <div className="button-row">
