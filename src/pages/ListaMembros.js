@@ -7,7 +7,9 @@ function ListaMembros() {
     const [membros, setMembros] = useState([]);
     const [celulas, setCelulas] = useState([]);
 
+    const [membroDetalhado, setMembroDetalhado] = useState(null);
     const [membroEditando, setMembroEditando] = useState(null);
+
     const [nomeEdit, setNomeEdit] = useState("");
     const [emailEdit, setEmailEdit] = useState("");
     const [cpfEdit, setCpfEdit] = useState("");
@@ -74,6 +76,8 @@ function ListaMembros() {
 
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
+        setMembroDetalhado(null);
+
         setNomeEdit(membro.nome || "");
         setEmailEdit(membro.email || "");
         setCpfEdit(membro.cpf || "");
@@ -174,6 +178,7 @@ function ListaMembros() {
             }
 
             alert("Membro excluído com sucesso!");
+            setMembroDetalhado(null);
             carregarMembros();
         } catch (error) {
             console.error("Erro ao excluir membro:", error);
@@ -222,10 +227,7 @@ function ListaMembros() {
                         onChange={(e) => setDataNascimentoEdit(e.target.value)}
                     />
 
-                    <select
-                        value={sexoEdit}
-                        onChange={(e) => setSexoEdit(e.target.value)}
-                    >
+                    <select value={sexoEdit} onChange={(e) => setSexoEdit(e.target.value)}>
                         <option value="">Sexo</option>
                         <option value="FEMININO">Feminino</option>
                         <option value="MASCULINO">Masculino</option>
@@ -301,57 +303,83 @@ function ListaMembros() {
                 </div>
             )}
 
+            {membroDetalhado && !membroEditando && (
+                <div className="form-card">
+                    <h3>Detalhes do membro</h3>
+
+                    <p><strong>Nome:</strong> {membroDetalhado.nome}</p>
+                    <p><strong>Email:</strong> {membroDetalhado.email}</p>
+                    <p><strong>CPF:</strong> {membroDetalhado.cpf}</p>
+                    <p><strong>Telefone:</strong> {membroDetalhado.telefone || "-"}</p>
+                    <p><strong>Data de nascimento:</strong> {formatarData(membroDetalhado.dataNascimento)}</p>
+                    <p><strong>Idade:</strong> {membroDetalhado.idade ?? "-"}</p>
+                    <p><strong>Sexo:</strong> {formatarOpcao(membroDetalhado.sexo)}</p>
+                    <p><strong>Estado civil:</strong> {formatarOpcao(membroDetalhado.estadoCivil)}</p>
+                    <p><strong>Endereço:</strong> {membroDetalhado.endereco || "-"}</p>
+                    <p><strong>Batizado:</strong> {membroDetalhado.batizado ? "Sim" : "Não"}</p>
+                    <p><strong>Membro desde:</strong> {formatarData(membroDetalhado.membroDesde)}</p>
+                    <p><strong>Célula:</strong> {membroDetalhado.celula ? membroDetalhado.celula.nome : "-"}</p>
+                    <p><strong>Voluntário:</strong> {membroDetalhado.voluntario ? "Sim" : "Não"}</p>
+
+                    <div className="button-row">
+                        <button
+                            className="secondary-button"
+                            onClick={() => iniciarEdicao(membroDetalhado)}
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            className="danger-button"
+                            onClick={() => excluir(membroDetalhado.id)}
+                        >
+                            Excluir
+                        </button>
+
+                        <button
+                            className="secondary-button"
+                            onClick={() => setMembroDetalhado(null)}
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="table-container">
                 <table className="data-table">
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Nome</th>
                         <th>Email</th>
-                        <th>CPF</th>
                         <th>Telefone</th>
                         <th>Idade</th>
                         <th>Sexo</th>
-                        <th>Estado civil</th>
                         <th>Batizado</th>
-                        <th>Membro desde</th>
                         <th>Célula</th>
                         <th>Voluntário</th>
-                        <th>Ações</th>
+                        <th>Detalhes</th>
                     </tr>
                     </thead>
 
                     <tbody>
                     {membros.map((m) => (
                         <tr key={m.id}>
-                            <td>{m.id}</td>
                             <td>{m.nome}</td>
                             <td>{m.email}</td>
-                            <td>{m.cpf}</td>
                             <td>{m.telefone || "-"}</td>
                             <td>{m.idade ?? "-"}</td>
                             <td>{formatarOpcao(m.sexo)}</td>
-                            <td>{formatarOpcao(m.estadoCivil)}</td>
                             <td>{m.batizado ? "Sim" : "Não"}</td>
-                            <td>{formatarData(m.membroDesde)}</td>
                             <td>{m.celula ? m.celula.nome : "-"}</td>
                             <td>{m.voluntario ? "Sim" : "Não"}</td>
                             <td>
-                                <div className="table-actions">
-                                    <button
-                                        className="secondary-button"
-                                        onClick={() => iniciarEdicao(m)}
-                                    >
-                                        Editar
-                                    </button>
-
-                                    <button
-                                        className="danger-button"
-                                        onClick={() => excluir(m.id)}
-                                    >
-                                        Excluir
-                                    </button>
-                                </div>
+                                <button
+                                    className="secondary-button"
+                                    onClick={() => setMembroDetalhado(m)}
+                                >
+                                    Detalhes
+                                </button>
                             </td>
                         </tr>
                     ))}
