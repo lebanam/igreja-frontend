@@ -130,29 +130,31 @@ function RelatorioFinanceiro() {
 
                             {aberto && (
                                 <div className="relatorio-mes-detalhe">
-                                    <p>
-                                        <strong>Arrecadação:</strong>{" "}
-                                        {formatarMoeda(resumo.arrecadacao)}
-                                    </p>
+                                    <ul className="membros-lista">
+                                        <li>
+                                            <strong>Arrecadação</strong> -{" "}
+                                            {formatarMoeda(resumo.arrecadacao)}
+                                        </li>
 
-                                    <p>
-                                        <strong>Despesa:</strong>{" "}
-                                        {formatarMoeda(resumo.despesa)}
-                                    </p>
+                                        <li>
+                                            <strong>Despesa</strong> -{" "}
+                                            {formatarMoeda(resumo.despesa)}
+                                        </li>
 
-                                    <p>
-                                        <strong>Total:</strong>{" "}
-                                        {formatarMoeda(resumo.total)}
-                                    </p>
+                                        <li>
+                                            <strong>Total</strong> -{" "}
+                                            {formatarMoeda(resumo.total)}
+                                        </li>
+                                    </ul>
 
                                     <h3>Lançamentos</h3>
 
                                     {resumo.lancamentos.length === 0 ? (
                                         <p>Nenhum lançamento neste mês.</p>
                                     ) : (
-                                        <ul className="membros-lista">
+                                        <div className="relatorio-lancamentos">
                                             {resumo.lancamentos.map((item) => (
-                                                <li key={item.id}>
+                                                <p key={item.id}>
                                                     <strong>
                                                         {item.tipo === "ARRECADACAO"
                                                             ? "Arrecadação"
@@ -160,9 +162,9 @@ function RelatorioFinanceiro() {
                                                     </strong>{" "}
                                                     - {item.descricao} -{" "}
                                                     {formatarMoeda(item.valor)}
-                                                </li>
+                                                </p>
                                             ))}
-                                        </ul>
+                                        </div>
                                     )}
                                 </div>
                             )}
