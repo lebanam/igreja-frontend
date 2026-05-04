@@ -19,12 +19,12 @@ function Home() {
         { title: "Membros", icon: Users, action: () => navigate("/membros") },
         { title: "Células", icon: HomeIcon, action: () => navigate("/celulas") },
         { title: "Ministérios", icon: Folder, action: () => alert("Em breve") },
-        { title: "Inventário", icon: Package, action: () => alert("Em breve") },
-        { title: "Financeiro", icon: DollarSign, action: () => alert("Em breve") },
         { title: "Visitantes", icon: UserPlus, action: () => alert("Em breve") },
-        { title: "Dashboard", icon: BarChart3, action: () => alert("Em breve") },
+        { title: "Financeiro", icon: DollarSign, action: () => alert("Em breve") },
         { title: "Kids", icon: Baby, action: () => alert("Em breve") },
         { title: "Eventos", icon: CalendarDays, action: () => alert("Em breve") },
+        { title: "Dashboard", icon: BarChart3, action: () => alert("Em breve") },
+        { title: "Inventário", icon: Package, action: () => alert("Em breve") },
     ];
 
     const sair = () => {
