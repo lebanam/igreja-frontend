@@ -18,14 +18,19 @@
 }
 
 .membro-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
     background: var(--bg-card-hover);
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
 }
 
+
 .membro-checkbox input {
-    margin-right: 8px;
+    margin: 0;
 }
 
 .membros-lista {
@@ -45,3 +50,4 @@
     font-size: 0.8rem;
     font-weight: 500;
 }
+

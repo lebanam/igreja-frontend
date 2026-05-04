@@ -266,14 +266,15 @@ function Celulas() {
                                             checked={membrosSelecionados.includes(String(m.id))}
                                             onChange={() => selecionarMembro(String(m.id))}
                                         />
-                                        <span>
-                                            {m.nome}
+
+                                        <span className="membro-label">
+        {m.nome}
                                             {estaEmOutraCelula && (
                                                 <small className="membro-aviso">
                                                     {" "}— será movido de {m.celula.nome}
                                                 </small>
                                             )}
-                                        </span>
+    </span>
                                     </label>
                                 );
                             })}
