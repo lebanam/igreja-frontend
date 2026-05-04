@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { API_URL } from "../config/api";
 import { formatarCPF, formatarTelefone } from "../utils/formatadores";
 import { validarEmail, validarCPF } from "../utils/validadores";
+import "./Membros.css";
 
 function ListaMembros() {
     const [membros, setMembros] = useState([]);
     const [celulas, setCelulas] = useState([]);
 
-    const [membroDetalhado, setMembroDetalhado] = useState(null);
+    const [membroDetalhadoId, setMembroDetalhadoId] = useState(null);
     const [membroEditando, setMembroEditando] = useState(null);
 
     const [nomeEdit, setNomeEdit] = useState("");
@@ -76,7 +77,7 @@ function ListaMembros() {
 
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
-        setMembroDetalhado(null);
+        setMembroDetalhadoId(null);
 
         setNomeEdit(membro.nome || "");
         setEmailEdit(membro.email || "");
@@ -178,12 +179,16 @@ function ListaMembros() {
             }
 
             alert("Membro excluído com sucesso!");
-            setMembroDetalhado(null);
+            setMembroDetalhadoId(null);
             carregarMembros();
         } catch (error) {
             console.error("Erro ao excluir membro:", error);
             alert(error.message);
         }
+    };
+
+    const alternarDetalhes = (id) => {
+        setMembroDetalhadoId(membroDetalhadoId === id ? null : id);
     };
 
     return (
@@ -303,49 +308,6 @@ function ListaMembros() {
                 </div>
             )}
 
-            {membroDetalhado && !membroEditando && (
-                <div className="form-card">
-                    <h3>Detalhes do membro</h3>
-
-                    <p><strong>Nome:</strong> {membroDetalhado.nome}</p>
-                    <p><strong>Email:</strong> {membroDetalhado.email}</p>
-                    <p><strong>CPF:</strong> {membroDetalhado.cpf}</p>
-                    <p><strong>Telefone:</strong> {membroDetalhado.telefone || "-"}</p>
-                    <p><strong>Data de nascimento:</strong> {formatarData(membroDetalhado.dataNascimento)}</p>
-                    <p><strong>Idade:</strong> {membroDetalhado.idade ?? "-"}</p>
-                    <p><strong>Sexo:</strong> {formatarOpcao(membroDetalhado.sexo)}</p>
-                    <p><strong>Estado civil:</strong> {formatarOpcao(membroDetalhado.estadoCivil)}</p>
-                    <p><strong>Endereço:</strong> {membroDetalhado.endereco || "-"}</p>
-                    <p><strong>Batizado:</strong> {membroDetalhado.batizado ? "Sim" : "Não"}</p>
-                    <p><strong>Membro desde:</strong> {formatarData(membroDetalhado.membroDesde)}</p>
-                    <p><strong>Célula:</strong> {membroDetalhado.celula ? membroDetalhado.celula.nome : "-"}</p>
-                    <p><strong>Voluntário:</strong> {membroDetalhado.voluntario ? "Sim" : "Não"}</p>
-
-                    <div className="button-row">
-                        <button
-                            className="secondary-button"
-                            onClick={() => iniciarEdicao(membroDetalhado)}
-                        >
-                            Editar
-                        </button>
-
-                        <button
-                            className="danger-button"
-                            onClick={() => excluir(membroDetalhado.id)}
-                        >
-                            Excluir
-                        </button>
-
-                        <button
-                            className="secondary-button"
-                            onClick={() => setMembroDetalhado(null)}
-                        >
-                            Fechar
-                        </button>
-                    </div>
-                </div>
-            )}
-
             <div className="table-container">
                 <table className="data-table">
                     <thead>
@@ -364,24 +326,65 @@ function ListaMembros() {
 
                     <tbody>
                     {membros.map((m) => (
-                        <tr key={m.id}>
-                            <td>{m.nome}</td>
-                            <td>{m.email}</td>
-                            <td>{m.telefone || "-"}</td>
-                            <td>{m.idade ?? "-"}</td>
-                            <td>{formatarOpcao(m.sexo)}</td>
-                            <td>{m.batizado ? "Sim" : "Não"}</td>
-                            <td>{m.celula ? m.celula.nome : "-"}</td>
-                            <td>{m.voluntario ? "Sim" : "Não"}</td>
-                            <td>
-                                <button
-                                    className="secondary-button"
-                                    onClick={() => setMembroDetalhado(m)}
-                                >
-                                    Detalhes
-                                </button>
-                            </td>
-                        </tr>
+                        <Fragment key={m.id}>
+                            <tr>
+                                <td>{m.nome}</td>
+                                <td>{m.email}</td>
+                                <td>{m.telefone || "-"}</td>
+                                <td>{m.idade ?? "-"}</td>
+                                <td>{formatarOpcao(m.sexo)}</td>
+                                <td>{m.batizado ? "Sim" : "Não"}</td>
+                                <td>{m.celula ? m.celula.nome : "-"}</td>
+                                <td>{m.voluntario ? "Sim" : "Não"}</td>
+                                <td>
+                                    <button
+                                        className="secondary-button"
+                                        onClick={() => alternarDetalhes(m.id)}
+                                    >
+                                        {membroDetalhadoId === m.id ? "Fechar" : "Detalhes"}
+                                    </button>
+                                </td>
+                            </tr>
+
+                            {membroDetalhadoId === m.id && (
+                                <tr className="detalhe-row">
+                                    <td colSpan="9">
+                                        <div className="detalhe-card">
+                                            <h3>{m.nome}</h3>
+
+                                            <p><strong>Email:</strong> {m.email}</p>
+                                            <p><strong>CPF:</strong> {m.cpf}</p>
+                                            <p><strong>Telefone:</strong> {m.telefone || "-"}</p>
+                                            <p><strong>Data de nascimento:</strong> {formatarData(m.dataNascimento)}</p>
+                                            <p><strong>Idade:</strong> {m.idade ?? "-"}</p>
+                                            <p><strong>Sexo:</strong> {formatarOpcao(m.sexo)}</p>
+                                            <p><strong>Estado civil:</strong> {formatarOpcao(m.estadoCivil)}</p>
+                                            <p><strong>Endereço:</strong> {m.endereco || "-"}</p>
+                                            <p><strong>Batizado:</strong> {m.batizado ? "Sim" : "Não"}</p>
+                                            <p><strong>Membro desde:</strong> {formatarData(m.membroDesde)}</p>
+                                            <p><strong>Célula:</strong> {m.celula ? m.celula.nome : "-"}</p>
+                                            <p><strong>Voluntário:</strong> {m.voluntario ? "Sim" : "Não"}</p>
+
+                                            <div className="button-row">
+                                                <button
+                                                    className="secondary-button"
+                                                    onClick={() => iniciarEdicao(m)}
+                                                >
+                                                    Editar
+                                                </button>
+
+                                                <button
+                                                    className="danger-button"
+                                                    onClick={() => excluir(m.id)}
+                                                >
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </Fragment>
                     ))}
                     </tbody>
                 </table>
