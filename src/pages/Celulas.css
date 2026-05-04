@@ -11,17 +11,11 @@
 }
 
 .membros-checkbox-list {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
     margin: 16px 0;
-    text-align: left;
-}
-
-.membros-checkbox-list {
-    display: grid;
-    gap: 8px;
-    margin: 16px 0;
-    text-align: left;
+    width: 100%;
 }
 
 .membro-checkbox {
@@ -29,28 +23,27 @@
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
-
     width: 100%;
     background: var(--bg-card-hover);
     padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
     box-sizing: border-box;
+    text-align: left;
 }
 
-.membro-checkbox input {
-    width: auto;
-    height: auto;
+.form-card .membro-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    padding: 0;
     margin: 0;
-    flex: 0 0 auto;
+    flex-shrink: 0;
 }
 
 .membro-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-block;
     text-align: left;
-    flex: 1;
+    line-height: 1.2;
 }
 
 .membro-aviso {
@@ -70,5 +63,3 @@
     padding: 10px;
     border-radius: 8px;
 }
-
-
