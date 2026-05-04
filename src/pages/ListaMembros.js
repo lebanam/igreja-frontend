@@ -5,6 +5,7 @@ import { validarEmail, validarCPF } from "../utils/validadores";
 
 function ListaMembros() {
     const [membros, setMembros] = useState([]);
+    const [celulas, setCelulas] = useState([]);
 
     const [membroEditando, setMembroEditando] = useState(null);
     const [nomeEdit, setNomeEdit] = useState("");
@@ -13,11 +14,12 @@ function ListaMembros() {
     const [telefoneEdit, setTelefoneEdit] = useState("");
     const [batizadoEdit, setBatizadoEdit] = useState(false);
     const [membroDesdeEdit, setMembroDesdeEdit] = useState("");
-    const [temCelulaEdit, setTemCelulaEdit] = useState(false);
+    const [celulaIdEdit, setCelulaIdEdit] = useState("");
     const [voluntarioEdit, setVoluntarioEdit] = useState(false);
 
     useEffect(() => {
         carregarMembros();
+        carregarCelulas();
     }, []);
 
     const carregarMembros = async () => {
@@ -37,6 +39,22 @@ function ListaMembros() {
         }
     };
 
+    const carregarCelulas = async () => {
+        try {
+            const response = await fetch(`${API_URL}/celulas/resumo`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
+
+            const data = await response.json();
+            setCelulas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Erro ao carregar células:", error);
+            setCelulas([]);
+        }
+    };
+
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
         setNomeEdit(membro.nome || "");
@@ -45,7 +63,7 @@ function ListaMembros() {
         setTelefoneEdit(membro.telefone || "");
         setBatizadoEdit(Boolean(membro.batizado));
         setMembroDesdeEdit(membro.membroDesde || "");
-        setTemCelulaEdit(Boolean(membro.temCelula));
+        setCelulaIdEdit(membro.celula?.id || "");
         setVoluntarioEdit(Boolean(membro.voluntario));
     };
 
@@ -57,7 +75,7 @@ function ListaMembros() {
         setTelefoneEdit("");
         setBatizadoEdit(false);
         setMembroDesdeEdit("");
-        setTemCelulaEdit(false);
+        setCelulaIdEdit("");
         setVoluntarioEdit(false);
     };
 
@@ -84,7 +102,7 @@ function ListaMembros() {
             telefone: telefoneEdit,
             batizado: batizadoEdit,
             membroDesde: membroDesdeEdit || null,
-            temCelula: temCelulaEdit,
+            celulaId: celulaIdEdit ? Number(celulaIdEdit) : null,
             voluntario: voluntarioEdit
         };
 
@@ -101,7 +119,7 @@ function ListaMembros() {
 
             if (!response.ok) {
                 console.error("Erro ao atualizar membro:", text);
-                throw new Error("Erro ao atualizar membro");
+                throw new Error(text || "Erro ao atualizar membro");
             }
 
             alert("Membro atualizado com sucesso!");
@@ -185,14 +203,20 @@ function ListaMembros() {
                         onChange={(e) => setMembroDesdeEdit(e.target.value)}
                     />
 
-                    <label className="checkbox-field">
-                        <input
-                            type="checkbox"
-                            checked={temCelulaEdit}
-                            onChange={(e) => setTemCelulaEdit(e.target.checked)}
-                        />
-                        <span>Possui célula</span>
-                    </label>
+                    <label className="field-label">Célula:</label>
+
+                    <select
+                        value={celulaIdEdit}
+                        onChange={(e) => setCelulaIdEdit(e.target.value)}
+                    >
+                        <option value="">Sem célula</option>
+
+                        {celulas.map((celula) => (
+                            <option key={celula.id} value={celula.id}>
+                                {celula.nome}
+                            </option>
+                        ))}
+                    </select>
 
                     <label className="checkbox-field">
                         <input
@@ -226,7 +250,7 @@ function ListaMembros() {
                         <th>Telefone</th>
                         <th>Batizado</th>
                         <th>Membro desde</th>
-                        <th>Possui célula</th>
+                        <th>Célula</th>
                         <th>Voluntário</th>
                         <th>Ações</th>
                     </tr>
@@ -242,7 +266,7 @@ function ListaMembros() {
                             <td>{m.telefone || "-"}</td>
                             <td>{m.batizado ? "Sim" : "Não"}</td>
                             <td>{m.membroDesde || "-"}</td>
-                            <td>{m.temCelula ? "Sim" : "Não"}</td>
+                            <td>{m.celula ? m.celula.nome : "-"}</td>
                             <td>{m.voluntario ? "Sim" : "Não"}</td>
                             <td>
                                 <div className="table-actions">

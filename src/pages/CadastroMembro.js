@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { API_URL } from "../config/api";
 import { formatarCPF, formatarTelefone } from "../utils/formatadores";
 import { validarEmail, validarCPF } from "../utils/validadores";
@@ -10,8 +10,29 @@ function CadastroMembro() {
     const [telefone, setTelefone] = useState("");
     const [batizado, setBatizado] = useState(false);
     const [membroDesde, setMembroDesde] = useState("");
-    const [temCelula, setTemCelula] = useState(false);
+    const [celulaId, setCelulaId] = useState("");
     const [voluntario, setVoluntario] = useState(false);
+    const [celulas, setCelulas] = useState([]);
+
+    useEffect(() => {
+        carregarCelulas();
+    }, []);
+
+    const carregarCelulas = async () => {
+        try {
+            const response = await fetch(`${API_URL}/celulas/resumo`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
+
+            const data = await response.json();
+            setCelulas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Erro ao carregar células:", error);
+            setCelulas([]);
+        }
+    };
 
     const limparFormulario = () => {
         setNome("");
@@ -20,7 +41,7 @@ function CadastroMembro() {
         setTelefone("");
         setBatizado(false);
         setMembroDesde("");
-        setTemCelula(false);
+        setCelulaId("");
         setVoluntario(false);
     };
 
@@ -47,7 +68,7 @@ function CadastroMembro() {
             telefone,
             batizado,
             membroDesde: membroDesde || null,
-            temCelula,
+            celulaId: celulaId ? Number(celulaId) : null,
             voluntario
         };
 
@@ -64,7 +85,7 @@ function CadastroMembro() {
 
             if (!response.ok) {
                 console.error("Erro ao salvar membro:", text);
-                throw new Error("Erro ao salvar membro");
+                throw new Error(text || "Erro ao salvar membro");
             }
 
             alert("Membro cadastrado com sucesso!");
@@ -122,14 +143,17 @@ function CadastroMembro() {
                 onChange={(e) => setMembroDesde(e.target.value)}
             />
 
-            <label className="checkbox-field">
-                <input
-                    type="checkbox"
-                    checked={temCelula}
-                    onChange={(e) => setTemCelula(e.target.checked)}
-                />
-                <span>Possui célula</span>
-            </label>
+            <label className="field-label">Célula:</label>
+
+            <select value={celulaId} onChange={(e) => setCelulaId(e.target.value)}>
+                <option value="">Sem célula</option>
+
+                {celulas.map((celula) => (
+                    <option key={celula.id} value={celula.id}>
+                        {celula.nome}
+                    </option>
+                ))}
+            </select>
 
             <label className="checkbox-field">
                 <input

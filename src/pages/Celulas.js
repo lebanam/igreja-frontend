@@ -70,6 +70,31 @@ function Celulas() {
         setModoFormulario(false);
     };
 
+    const atualizarMembro = async (membro, celulaId) => {
+        const response = await fetch(`${API_URL}/membros/${membro.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nome: membro.nome,
+                email: membro.email,
+                cpf: membro.cpf,
+                telefone: membro.telefone,
+                batizado: membro.batizado,
+                membroDesde: membro.membroDesde || null,
+                voluntario: membro.voluntario,
+                celulaId
+            })
+        });
+
+        const text = await response.text();
+
+        if (!response.ok) {
+            throw new Error(text || `Erro ao atualizar membro ${membro.nome}`);
+        }
+    };
+
     const salvarCelula = async () => {
         if (!nome || !tema || !quando || !onde || !lider) {
             alert("Preencha nome, tema, quando, onde e líder");
@@ -82,8 +107,7 @@ function Celulas() {
             quando,
             onde,
             lider,
-            coLider,
-            membrosIds: membrosSelecionados.map((id) => Number(id))
+            coLider
         };
 
         try {
@@ -105,9 +129,30 @@ function Celulas() {
                 throw new Error(text || "Erro ao salvar célula");
             }
 
+            const celulaSalva = JSON.parse(text);
+            const celulaId = celulaSalva.id;
+
+            const membrosDaCelulaAntes = membros.filter(
+                (m) => m.celula?.id === celulaId
+            );
+
+            const membrosParaAdicionar = membros.filter((m) =>
+                membrosSelecionados.includes(String(m.id))
+            );
+
+            const membrosParaRemover = membrosDaCelulaAntes.filter(
+                (m) => !membrosSelecionados.includes(String(m.id))
+            );
+
+            await Promise.all([
+                ...membrosParaAdicionar.map((m) => atualizarMembro(m, celulaId)),
+                ...membrosParaRemover.map((m) => atualizarMembro(m, null))
+            ]);
+
             alert("Célula salva com sucesso!");
             limparFormulario();
             carregarCelulas();
+            carregarMembros();
         } catch (error) {
             alert(error.message);
         }
@@ -134,6 +179,12 @@ function Celulas() {
         if (!confirmar) return;
 
         try {
+            const membrosDaCelula = membros.filter((m) => m.celula?.id === id);
+
+            await Promise.all(
+                membrosDaCelula.map((m) => atualizarMembro(m, null))
+            );
+
             const response = await fetch(`${API_URL}/celulas/${id}`, {
                 method: "DELETE"
             });
@@ -145,6 +196,7 @@ function Celulas() {
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
             carregarCelulas();
+            carregarMembros();
         } catch (error) {
             alert(error.message);
         }
@@ -281,15 +333,24 @@ function Celulas() {
                     )}
 
                     <div className="button-row">
-                        <button className="secondary-button" onClick={() => editarCelula(celulaSelecionada)}>
+                        <button
+                            className="secondary-button"
+                            onClick={() => editarCelula(celulaSelecionada)}
+                        >
                             Editar
                         </button>
 
-                        <button className="danger-button" onClick={() => excluirCelula(celulaSelecionada.id)}>
+                        <button
+                            className="danger-button"
+                            onClick={() => excluirCelula(celulaSelecionada.id)}
+                        >
                             Excluir
                         </button>
 
-                        <button className="secondary-button" onClick={() => setCelulaSelecionada(null)}>
+                        <button
+                            className="secondary-button"
+                            onClick={() => setCelulaSelecionada(null)}
+                        >
                             Fechar
                         </button>
                     </div>
