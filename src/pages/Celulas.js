@@ -22,12 +22,9 @@ function Celulas() {
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
 
     useEffect(() => {
-        carregarDados();
+        carregarMembros();
+        carregarCelulas();
     }, []);
-
-    const carregarDados = async () => {
-        await Promise.all([carregarMembros(), carregarCelulas()]);
-    };
 
     const carregarMembros = async () => {
         try {
@@ -59,6 +56,11 @@ function Celulas() {
             alert(error.message);
             setCelulas([]);
         }
+    };
+
+    const recarregarDados = () => {
+        carregarMembros();
+        carregarCelulas();
     };
 
     const limparFormulario = () => {
@@ -95,26 +97,6 @@ function Celulas() {
             return;
         }
 
-        const membrosMovidos = membros.filter(
-            (m) =>
-                membrosSelecionados.includes(String(m.id)) &&
-                m.celula &&
-                celulaSelecionada &&
-                m.celula.id !== celulaSelecionada.id
-        );
-
-        if (membrosMovidos.length > 0) {
-            const nomes = membrosMovidos
-                .map((m) => `${m.nome} (${m.celula.nome})`)
-                .join(", ");
-
-            const confirmar = window.confirm(
-                `Os seguintes membros já estão em outra célula e serão movidos para esta célula: ${nomes}. Deseja continuar?`
-            );
-
-            if (!confirmar) return;
-        }
-
         const dados = {
             nome,
             tema,
@@ -146,6 +128,25 @@ function Celulas() {
             const celulaSalva = JSON.parse(text);
             const celulaId = celulaSalva.id;
 
+            const membrosMovidos = membros.filter(
+                (m) =>
+                    membrosSelecionados.includes(String(m.id)) &&
+                    m.celula &&
+                    m.celula.id !== celulaId
+            );
+
+            if (membrosMovidos.length > 0) {
+                const nomes = membrosMovidos
+                    .map((m) => `${m.nome} (${m.celula.nome})`)
+                    .join(", ");
+
+                const confirmar = window.confirm(
+                    `Os seguintes membros já estão em outra célula e serão movidos para esta célula: ${nomes}. Deseja continuar?`
+                );
+
+                if (!confirmar) return;
+            }
+
             const membrosAtuaisDaCelula = membros.filter(
                 (m) => m.celula?.id === celulaId
             );
@@ -169,7 +170,7 @@ function Celulas() {
 
             alert("Célula salva com sucesso!");
             limparFormulario();
-            carregarDados();
+            recarregarDados();
         } catch (error) {
             alert(error.message);
         }
@@ -209,7 +210,7 @@ function Celulas() {
 
             alert("Célula excluída com sucesso!");
             setCelulaSelecionada(null);
-            carregarDados();
+            recarregarDados();
         } catch (error) {
             alert(error.message);
         }
@@ -265,7 +266,6 @@ function Celulas() {
                                             checked={membrosSelecionados.includes(String(m.id))}
                                             onChange={() => selecionarMembro(String(m.id))}
                                         />
-
                                         <span>
                                             {m.nome}
                                             {estaEmOutraCelula && (
