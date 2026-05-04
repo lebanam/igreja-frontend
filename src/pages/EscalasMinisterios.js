@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { CalendarDays } from "lucide-react";
 import "./Celulas.css";
@@ -24,9 +24,9 @@ function EscalasMinisterio() {
 
     useEffect(() => {
         carregarEscalas();
-    }, [ministerioId]);
+    }, [carregarEscalas]);
 
-    const carregarEscalas = async () => {
+    const carregarEscalas = useCallback(async () => {
         try {
             const response = await fetch(`${API_URL}/ministerios/${ministerioId}/escalas`);
 
@@ -40,7 +40,7 @@ function EscalasMinisterio() {
             alert(error.message);
             setEscalas([]);
         }
-    };
+    }, [ministerioId]);
 
     const limparFormulario = () => {
         setData("");
