@@ -5,7 +5,6 @@ import { validarEmail, validarCPF } from "../utils/validadores";
 
 function ListaMembros() {
     const [membros, setMembros] = useState([]);
-    const [celulas, setCelulas] = useState([]);
 
     const [membroEditando, setMembroEditando] = useState(null);
     const [nomeEdit, setNomeEdit] = useState("");
@@ -14,12 +13,11 @@ function ListaMembros() {
     const [telefoneEdit, setTelefoneEdit] = useState("");
     const [batizadoEdit, setBatizadoEdit] = useState(false);
     const [membroDesdeEdit, setMembroDesdeEdit] = useState("");
-    const [gcEdit, setGcEdit] = useState("");
+    const [temCelulaEdit, setTemCelulaEdit] = useState(false);
     const [voluntarioEdit, setVoluntarioEdit] = useState(false);
 
     useEffect(() => {
         carregarMembros();
-        carregarCelulas();
     }, []);
 
     const carregarMembros = async () => {
@@ -39,23 +37,6 @@ function ListaMembros() {
         }
     };
 
-    const carregarCelulas = async () => {
-        try {
-            const response = await fetch(`${API_URL}/celulas`);
-
-            if (!response.ok) {
-                throw new Error("Erro ao carregar células");
-            }
-
-            const data = await response.json();
-            setCelulas(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error("Erro ao carregar células:", error);
-            alert("Erro ao carregar células");
-            setCelulas([]);
-        }
-    };
-
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
         setNomeEdit(membro.nome || "");
@@ -64,7 +45,7 @@ function ListaMembros() {
         setTelefoneEdit(membro.telefone || "");
         setBatizadoEdit(Boolean(membro.batizado));
         setMembroDesdeEdit(membro.membroDesde || "");
-        setGcEdit(membro.gc || "");
+        setTemCelulaEdit(Boolean(membro.temCelula));
         setVoluntarioEdit(Boolean(membro.voluntario));
     };
 
@@ -76,7 +57,7 @@ function ListaMembros() {
         setTelefoneEdit("");
         setBatizadoEdit(false);
         setMembroDesdeEdit("");
-        setGcEdit("");
+        setTemCelulaEdit(false);
         setVoluntarioEdit(false);
     };
 
@@ -103,7 +84,7 @@ function ListaMembros() {
             telefone: telefoneEdit,
             batizado: batizadoEdit,
             membroDesde: membroDesdeEdit || null,
-            gc: gcEdit,
+            temCelula: temCelulaEdit,
             voluntario: voluntarioEdit
         };
 
@@ -187,40 +168,39 @@ function ListaMembros() {
                         onChange={(e) => setTelefoneEdit(formatarTelefone(e.target.value))}
                     />
 
-                    <label>
+                    <label className="checkbox-field">
                         <input
                             type="checkbox"
                             checked={batizadoEdit}
                             onChange={(e) => setBatizadoEdit(e.target.checked)}
                         />
-                        Batizado
+                        <span>Batizado</span>
                     </label>
 
-                    <label>
-                        Membro desde:
+                    <label className="field-label">Membro desde:</label>
+
+                    <input
+                        type="date"
+                        value={membroDesdeEdit}
+                        onChange={(e) => setMembroDesdeEdit(e.target.value)}
+                    />
+
+                    <label className="checkbox-field">
                         <input
-                            type="date"
-                            value={membroDesdeEdit}
-                            onChange={(e) => setMembroDesdeEdit(e.target.value)}
+                            type="checkbox"
+                            checked={temCelulaEdit}
+                            onChange={(e) => setTemCelulaEdit(e.target.checked)}
                         />
+                        <span>Possui célula</span>
                     </label>
 
-                    <select value={gcEdit} onChange={(e) => setGcEdit(e.target.value)}>
-                        <option value="">Selecione uma célula</option>
-                        {celulas.map((c) => (
-                            <option key={c.id} value={c.nome}>
-                                {c.nome}
-                            </option>
-                        ))}
-                    </select>
-
-                    <label>
+                    <label className="checkbox-field">
                         <input
                             type="checkbox"
                             checked={voluntarioEdit}
                             onChange={(e) => setVoluntarioEdit(e.target.checked)}
                         />
-                        Voluntário
+                        <span>Voluntário</span>
                     </label>
 
                     <div className="button-row">
@@ -246,7 +226,7 @@ function ListaMembros() {
                         <th>Telefone</th>
                         <th>Batizado</th>
                         <th>Membro desde</th>
-                        <th>GC</th>
+                        <th>Possui célula</th>
                         <th>Voluntário</th>
                         <th>Ações</th>
                     </tr>
@@ -262,7 +242,7 @@ function ListaMembros() {
                             <td>{m.telefone || "-"}</td>
                             <td>{m.batizado ? "Sim" : "Não"}</td>
                             <td>{m.membroDesde || "-"}</td>
-                            <td>{m.gc || "-"}</td>
+                            <td>{m.temCelula ? "Sim" : "Não"}</td>
                             <td>{m.voluntario ? "Sim" : "Não"}</td>
                             <td>
                                 <div className="table-actions">
