@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { API_URL } from "../config/api";
 import { formatarCPF, formatarTelefone } from "../utils/formatadores";
 import { validarEmail, validarCPF } from "../utils/validadores";
@@ -10,30 +10,8 @@ function CadastroMembro() {
     const [telefone, setTelefone] = useState("");
     const [batizado, setBatizado] = useState(false);
     const [membroDesde, setMembroDesde] = useState("");
-    const [gc, setGc] = useState("");
+    const [temCelula, setTemCelula] = useState(false);
     const [voluntario, setVoluntario] = useState(false);
-    const [celulas, setCelulas] = useState([]);
-
-    useEffect(() => {
-        carregarCelulas();
-    }, []);
-
-    const carregarCelulas = async () => {
-        try {
-            const response = await fetch(`${API_URL}/celulas`);
-
-            if (!response.ok) {
-                throw new Error("Erro ao carregar células");
-            }
-
-            const data = await response.json();
-            setCelulas(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error("Erro ao carregar células:", error);
-            alert("Erro ao carregar células");
-            setCelulas([]);
-        }
-    };
 
     const limparFormulario = () => {
         setNome("");
@@ -42,7 +20,7 @@ function CadastroMembro() {
         setTelefone("");
         setBatizado(false);
         setMembroDesde("");
-        setGc("");
+        setTemCelula(false);
         setVoluntario(false);
     };
 
@@ -69,7 +47,7 @@ function CadastroMembro() {
             telefone,
             batizado,
             membroDesde: membroDesde || null,
-            gc,
+            temCelula,
             voluntario
         };
 
@@ -144,14 +122,14 @@ function CadastroMembro() {
                 onChange={(e) => setMembroDesde(e.target.value)}
             />
 
-            <select value={gc} onChange={(e) => setGc(e.target.value)}>
-                <option value="">Selecione uma célula</option>
-                {celulas.map((c) => (
-                    <option key={c.id} value={c.nome}>
-                        {c.nome}
-                    </option>
-                ))}
-            </select>
+            <label className="checkbox-field">
+                <input
+                    type="checkbox"
+                    checked={temCelula}
+                    onChange={(e) => setTemCelula(e.target.checked)}
+                />
+                <span>Possui célula</span>
+            </label>
 
             <label className="checkbox-field">
                 <input
