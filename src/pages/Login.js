@@ -7,14 +7,38 @@ function Login() {
     const [senha, setSenha] = useState("");
     const navigate = useNavigate();
 
-    function fazerLogin(e) {
+    async function fazerLogin(e) {
         e.preventDefault();
 
-        if (email === "admin@igreja360.com" && senha === "123456") {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    senha,
+                }),
+            });
+
+            if (!response.ok) {
+                alert("E-mail ou senha inválidos");
+                return;
+            }
+
+            const data = await response.json();
+
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("usuarioNome", data.nome);
+            localStorage.setItem("usuarioEmail", data.email);
+            localStorage.setItem("usuarioRole", data.role);
             localStorage.setItem("logado", "true");
+
             navigate("/home");
-        } else {
-            alert("E-mail ou senha inválidos");
+        } catch (error) {
+            console.error("Erro ao fazer login:", error);
+            alert("Erro ao conectar com o servidor");
         }
     }
 
