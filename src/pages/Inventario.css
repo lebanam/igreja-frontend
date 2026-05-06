@@ -20,25 +20,58 @@
     color: var(--text-primary);
 }
 
+.inventario-linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inventario-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--bg-card-hover);
+}
+
+.inventario-linha strong {
+    color: var(--text-primary);
+}
+
+.inventario-linha small {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-secondary);
+}
+
+.inventario-linha span {
+    min-width: 42px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border-radius: 999px;
+    padding: 6px 12px;
+}
+
 .inventario-itens {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-top: 16px;
 }
 
 .inventario-item {
     display: grid;
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: 1fr 220px;
     gap: 16px;
     padding: 18px;
     border-radius: 16px;
     background: var(--bg-secondary);
     border: 1px solid var(--bg-card-hover);
-    transition: 0.2s ease;
-}
-
-.inventario-item:hover {
-    background: var(--bg-card-hover);
 }
 
 .inventario-item__main {
@@ -59,9 +92,6 @@
 }
 
 .inventario-item__numbers label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
     color: var(--text-secondary);
     font-size: 14px;
 }
@@ -73,33 +103,11 @@
     align-items: center;
 }
 
-.quantity-control input {
+.quantity-control span {
     text-align: center;
-}
-
-.status-badge {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px 10px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.status-badge--success {
-    color: #166534;
-    background: #dcfce7;
-}
-
-.status-badge--warning {
-    color: #92400e;
-    background: #fef3c7;
-}
-
-.status-badge--danger {
-    color: #991b1b;
-    background: #fee2e2;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 @media (max-width: 900px) {

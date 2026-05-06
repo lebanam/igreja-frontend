@@ -12,8 +12,9 @@ function Inventario() {
     const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
 
     const [modoFormularioCategoria, setModoFormularioCategoria] = useState(false);
-    const [categoriaEditando, setCategoriaEditando] = useState(null);
+    const [modoEdicaoItens, setModoEdicaoItens] = useState(false);
 
+    const [categoriaEditando, setCategoriaEditando] = useState(null);
     const [nomeCategoria, setNomeCategoria] = useState("");
     const [descricaoCategoria, setDescricaoCategoria] = useState("");
 
@@ -39,19 +40,31 @@ function Inventario() {
         }
     };
 
+    const buscarCategoria = async (id) => {
+        const response = await fetch(`${API_URL}/inventario/categorias/${id}`);
+
+        if (!response.ok) {
+            throw new Error("Erro ao buscar categoria");
+        }
+
+        return response.json();
+    };
+
     const selecionarCategoria = (categoria) => {
         setCategoriaSelecionada(categoria);
         setItensEditaveis(Array.isArray(categoria.itens) ? categoria.itens : []);
         setModoFormularioCategoria(false);
+        setModoEdicaoItens(false);
         setCategoriaEditando(null);
     };
 
     const abrirNovaCategoria = () => {
+        setCategoriaSelecionada(null);
         setCategoriaEditando(null);
         setNomeCategoria("");
         setDescricaoCategoria("");
         setModoFormularioCategoria(true);
-        setCategoriaSelecionada(null);
+        setModoEdicaoItens(false);
     };
 
     const editarCategoria = (categoria) => {
@@ -59,6 +72,7 @@ function Inventario() {
         setNomeCategoria(categoria.nome || "");
         setDescricaoCategoria(categoria.descricao || "");
         setModoFormularioCategoria(true);
+        setModoEdicaoItens(false);
     };
 
     const limparFormularioCategoria = () => {
@@ -98,9 +112,20 @@ function Inventario() {
                 throw new Error(text || "Erro ao salvar categoria");
             }
 
+            const categoriaSalva = JSON.parse(text);
+
             alert("Categoria salva com sucesso!");
-            limparFormularioCategoria();
+
+            setModoFormularioCategoria(false);
+            setCategoriaEditando(null);
+            setNomeCategoria("");
+            setDescricaoCategoria("");
+
             await carregarCategorias();
+
+            const categoriaAtualizada = await buscarCategoria(categoriaSalva.id);
+            setCategoriaSelecionada(categoriaAtualizada);
+            setItensEditaveis(categoriaAtualizada.itens || []);
         } catch (error) {
             alert(error.message);
         }
@@ -131,6 +156,27 @@ function Inventario() {
         }
     };
 
+    const iniciarEdicaoItens = () => {
+        setItensEditaveis(
+            Array.isArray(categoriaSelecionada.itens)
+                ? categoriaSelecionada.itens.map((item) => ({ ...item }))
+                : []
+        );
+
+        setModoEdicaoItens(true);
+        setModoFormularioCategoria(false);
+    };
+
+    const cancelarEdicaoItens = () => {
+        setItensEditaveis(
+            Array.isArray(categoriaSelecionada.itens)
+                ? categoriaSelecionada.itens
+                : []
+        );
+
+        setModoEdicaoItens(false);
+    };
+
     const adicionarItemLocal = () => {
         setItensEditaveis((itens) => [
             ...itens,
@@ -138,8 +184,6 @@ function Inventario() {
                 id: null,
                 nome: "",
                 quantidade: 0,
-                quantidadeMinima: 0,
-                localizacao: "",
                 observacao: ""
             }
         ]);
@@ -149,10 +193,7 @@ function Inventario() {
         setItensEditaveis((itens) =>
             itens.map((item, itemIndex) =>
                 itemIndex === index
-                    ? {
-                        ...item,
-                        [campo]: valor
-                    }
+                    ? { ...item, [campo]: valor }
                     : item
             )
         );
@@ -163,14 +204,9 @@ function Inventario() {
             itens.map((item, itemIndex) => {
                 if (itemIndex !== index) return item;
 
-                const novaQuantidade = Math.max(
-                    0,
-                    Number(item.quantidade || 0) + valor
-                );
-
                 return {
                     ...item,
-                    quantidade: novaQuantidade
+                    quantidade: Math.max(0, Number(item.quantidade || 0) + valor)
                 };
             })
         );
@@ -197,9 +233,8 @@ function Inventario() {
                 throw new Error(text || "Erro ao excluir item");
             }
 
-            alert("Item excluído com sucesso!");
-
             const categoriaAtualizada = await buscarCategoria(categoriaSelecionada.id);
+
             setCategoriaSelecionada(categoriaAtualizada);
             setItensEditaveis(categoriaAtualizada.itens || []);
             await carregarCategorias();
@@ -208,22 +243,12 @@ function Inventario() {
         }
     };
 
-    const buscarCategoria = async (id) => {
-        const response = await fetch(`${API_URL}/inventario/categorias/${id}`);
-
-        if (!response.ok) {
-            throw new Error("Erro ao buscar categoria");
-        }
-
-        return response.json();
-    };
-
     const salvarItens = async () => {
         if (!categoriaSelecionada) return;
 
-        const itensValidos = itensEditaveis.filter((item) => item.nome.trim());
+        const itemSemNome = itensEditaveis.some((item) => !item.nome.trim());
 
-        if (itensValidos.length !== itensEditaveis.length) {
+        if (itemSemNome) {
             alert("Todos os itens precisam ter nome");
             return;
         }
@@ -232,8 +257,6 @@ function Inventario() {
             id: item.id,
             nome: item.nome.trim(),
             quantidade: Number(item.quantidade) || 0,
-            quantidadeMinima: Number(item.quantidadeMinima) || 0,
-            localizacao: item.localizacao || "",
             observacao: item.observacao || ""
         }));
 
@@ -258,24 +281,15 @@ function Inventario() {
             alert("Itens salvos com sucesso!");
 
             const categoriaAtualizada = await buscarCategoria(categoriaSelecionada.id);
+
             setCategoriaSelecionada(categoriaAtualizada);
             setItensEditaveis(categoriaAtualizada.itens || []);
+            setModoEdicaoItens(false);
+
             await carregarCategorias();
         } catch (error) {
             alert(error.message);
         }
-    };
-
-    const obterTextoStatus = (status) => {
-        if (status === "SEM_ESTOQUE") return "Sem estoque";
-        if (status === "BAIXO_ESTOQUE") return "Baixo estoque";
-        return "Ok";
-    };
-
-    const obterClasseStatus = (status) => {
-        if (status === "SEM_ESTOQUE") return "status-badge status-badge--danger";
-        if (status === "BAIXO_ESTOQUE") return "status-badge status-badge--warning";
-        return "status-badge status-badge--success";
     };
 
     return (
@@ -330,9 +344,7 @@ function Inventario() {
                         </div>
 
                         <strong>{categoria.nome}</strong>
-
                         <p>{categoria.descricao || "Sem descrição"}</p>
-
                         <small>{categoria.totalItens || 0} item(ns)</small>
                     </div>
                 ))}
@@ -373,46 +385,64 @@ function Inventario() {
                     <div className="inventario-header">
                         <h3>Itens</h3>
 
-                        <button className="primary-button" onClick={adicionarItemLocal}>
-                            Novo Item
-                        </button>
+                        {!modoEdicaoItens && (
+                            <button className="primary-button" onClick={iniciarEdicaoItens}>
+                                Editar Itens
+                            </button>
+                        )}
                     </div>
 
-                    {itensEditaveis.length === 0 ? (
-                        <p>Nenhum item cadastrado nesta categoria.</p>
-                    ) : (
-                        <div className="inventario-itens">
-                            {itensEditaveis.map((item, index) => (
-                                <div key={item.id || index} className="inventario-item">
-                                    <div className="inventario-item__main">
-                                        <input
-                                            placeholder="Nome do item"
-                                            value={item.nome}
-                                            onChange={(e) =>
-                                                atualizarItem(index, "nome", e.target.value)
-                                            }
-                                        />
+                    {!modoEdicaoItens && (
+                        <>
+                            {!categoriaSelecionada.itens || categoriaSelecionada.itens.length === 0 ? (
+                                <p>Nenhum item cadastrado nesta categoria.</p>
+                            ) : (
+                                <div className="inventario-linhas">
+                                    {categoriaSelecionada.itens.map((item) => (
+                                        <div key={item.id} className="inventario-linha">
+                                            <div>
+                                                <strong>{item.nome}</strong>
+                                                {item.observacao && <small>{item.observacao}</small>}
+                                            </div>
 
-                                        <input
-                                            placeholder="Localização"
-                                            value={item.localizacao || ""}
-                                            onChange={(e) =>
-                                                atualizarItem(index, "localizacao", e.target.value)
-                                            }
-                                        />
+                                            <span>{item.quantidade}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
 
-                                        <textarea
-                                            placeholder="Observação"
-                                            value={item.observacao || ""}
-                                            onChange={(e) =>
-                                                atualizarItem(index, "observacao", e.target.value)
-                                            }
-                                        />
-                                    </div>
+                    {modoEdicaoItens && (
+                        <>
+                            <button className="primary-button" onClick={adicionarItemLocal}>
+                                Novo Item
+                            </button>
 
-                                    <div className="inventario-item__numbers">
-                                        <label>
-                                            Quantidade
+                            <div className="inventario-itens">
+                                {itensEditaveis.map((item, index) => (
+                                    <div key={item.id || index} className="inventario-item">
+                                        <div className="inventario-item__main">
+                                            <input
+                                                placeholder="Nome do item"
+                                                value={item.nome}
+                                                onChange={(e) =>
+                                                    atualizarItem(index, "nome", e.target.value)
+                                                }
+                                            />
+
+                                            <textarea
+                                                placeholder="Observação"
+                                                value={item.observacao || ""}
+                                                onChange={(e) =>
+                                                    atualizarItem(index, "observacao", e.target.value)
+                                                }
+                                            />
+                                        </div>
+
+                                        <div className="inventario-item__numbers">
+                                            <label>Quantidade</label>
+
                                             <div className="quantity-control">
                                                 <button
                                                     type="button"
@@ -422,18 +452,7 @@ function Inventario() {
                                                     -
                                                 </button>
 
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    value={item.quantidade}
-                                                    onChange={(e) =>
-                                                        atualizarItem(
-                                                            index,
-                                                            "quantidade",
-                                                            Math.max(0, Number(e.target.value))
-                                                        )
-                                                    }
-                                                />
+                                                <span>{item.quantidade}</span>
 
                                                 <button
                                                     type="button"
@@ -443,47 +462,29 @@ function Inventario() {
                                                     +
                                                 </button>
                                             </div>
-                                        </label>
 
-                                        <label>
-                                            Quantidade mínima
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                value={item.quantidadeMinima}
-                                                onChange={(e) =>
-                                                    atualizarItem(
-                                                        index,
-                                                        "quantidadeMinima",
-                                                        Math.max(0, Number(e.target.value))
-                                                    )
-                                                }
-                                            />
-                                        </label>
-
-                                        {item.status && (
-                                            <span className={obterClasseStatus(item.status)}>
-                                                {obterTextoStatus(item.status)}
-                                            </span>
-                                        )}
-
-                                        <button
-                                            className="danger-button"
-                                            onClick={() => removerItemLocal(item, index)}
-                                        >
-                                            Excluir Item
-                                        </button>
+                                            <button
+                                                className="danger-button"
+                                                onClick={() => removerItemLocal(item, index)}
+                                            >
+                                                Excluir Item
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
 
-                    <div className="button-row">
-                        <button className="primary-button" onClick={salvarItens}>
-                            Salvar Alterações dos Itens
-                        </button>
-                    </div>
+                            <div className="button-row">
+                                <button className="primary-button" onClick={salvarItens}>
+                                    Salvar Alterações
+                                </button>
+
+                                <button className="secondary-button" onClick={cancelarEdicaoItens}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
         </div>
