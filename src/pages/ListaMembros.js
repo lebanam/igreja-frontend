@@ -7,6 +7,7 @@ import "./Membros.css";
 function ListaMembros() {
     const [membros, setMembros] = useState([]);
     const [celulas, setCelulas] = useState([]);
+    const [buscaMembro, setBuscaMembro] = useState("");
 
     const [membroDetalhadoId, setMembroDetalhadoId] = useState(null);
     const [membroEditando, setMembroEditando] = useState(null);
@@ -30,6 +31,22 @@ function ListaMembros() {
         carregarMembros();
         carregarCelulas();
     }, []);
+
+    const membrosOrdenados = [...membros].sort((a, b) =>
+        (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+            sensitivity: "base"
+        })
+    );
+
+    const membrosFiltrados = membrosOrdenados.filter((membro) => {
+        const termo = buscaMembro.toLowerCase().trim();
+
+        return (
+            membro.nome?.toLowerCase().includes(termo) ||
+            membro.email?.toLowerCase().includes(termo) ||
+            membro.telefone?.toLowerCase().includes(termo)
+        );
+    });
 
     const rolarParaDetalhes = () => {
         setTimeout(() => {
@@ -373,6 +390,15 @@ function ListaMembros() {
         <div className="page-container">
             <h2>Lista de Membros</h2>
 
+            <div className="lista-membros-header">
+                <input
+                    className="search-input"
+                    placeholder="Buscar por nome, email ou telefone..."
+                    value={buscaMembro}
+                    onChange={(e) => setBuscaMembro(e.target.value)}
+                />
+            </div>
+
             <div className="table-container">
                 <table className="data-table">
                     <thead>
@@ -390,38 +416,46 @@ function ListaMembros() {
                     </thead>
 
                     <tbody>
-                    {membros.map((m) => (
-                        <Fragment key={m.id}>
-                            <tr>
-                                <td>{m.nome}</td>
-                                <td>{m.email}</td>
-                                <td>{m.telefone || "-"}</td>
-                                <td>{m.idade ?? "-"}</td>
-                                <td>{formatarOpcao(m.sexo)}</td>
-                                <td>{m.batizado ? "Sim" : "Não"}</td>
-                                <td>{m.celula ? m.celula.nome : "-"}</td>
-                                <td>{m.voluntario ? "Sim" : "Não"}</td>
-                                <td>
-                                    <button
-                                        className="secondary-button"
-                                        onClick={() => alternarDetalhes(m.id)}
-                                    >
-                                        {membroDetalhadoId === m.id ? "Fechar" : "Detalhes"}
-                                    </button>
-                                </td>
-                            </tr>
-
-                            {membroDetalhadoId === m.id && (
-                                <tr className="detalhe-row">
-                                    <td colSpan="9">
-                                        {membroEditando?.id === m.id
-                                            ? renderizarFormularioEdicao()
-                                            : renderizarDetalhes(m)}
+                    {membrosFiltrados.length === 0 ? (
+                        <tr>
+                            <td colSpan="9">
+                                Nenhum membro encontrado.
+                            </td>
+                        </tr>
+                    ) : (
+                        membrosFiltrados.map((m) => (
+                            <Fragment key={m.id}>
+                                <tr>
+                                    <td>{m.nome}</td>
+                                    <td>{m.email}</td>
+                                    <td>{m.telefone || "-"}</td>
+                                    <td>{m.idade ?? "-"}</td>
+                                    <td>{formatarOpcao(m.sexo)}</td>
+                                    <td>{m.batizado ? "Sim" : "Não"}</td>
+                                    <td>{m.celula ? m.celula.nome : "-"}</td>
+                                    <td>{m.voluntario ? "Sim" : "Não"}</td>
+                                    <td>
+                                        <button
+                                            className="secondary-button"
+                                            onClick={() => alternarDetalhes(m.id)}
+                                        >
+                                            {membroDetalhadoId === m.id ? "Fechar" : "Detalhes"}
+                                        </button>
                                     </td>
                                 </tr>
-                            )}
-                        </Fragment>
-                    ))}
+
+                                {membroDetalhadoId === m.id && (
+                                    <tr className="detalhe-row">
+                                        <td colSpan="9">
+                                            {membroEditando?.id === m.id
+                                                ? renderizarFormularioEdicao()
+                                                : renderizarDetalhes(m)}
+                                        </td>
+                                    </tr>
+                                )}
+                            </Fragment>
+                        ))
+                    )}
                     </tbody>
                 </table>
             </div>
