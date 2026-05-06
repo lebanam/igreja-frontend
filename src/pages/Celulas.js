@@ -10,8 +10,13 @@ function Celulas() {
 
     const [celulas, setCelulas] = useState([]);
     const [membros, setMembros] = useState([]);
+    const [relatorios, setRelatorios] = useState([]);
+
     const [modoFormulario, setModoFormulario] = useState(false);
+    const [modoRelatorio, setModoRelatorio] = useState(false);
     const [celulaSelecionada, setCelulaSelecionada] = useState(null);
+    const [relatorioSelecionado, setRelatorioSelecionado] = useState(null);
+
     const [buscaMembro, setBuscaMembro] = useState("");
 
     const [nome, setNome] = useState("");
@@ -22,10 +27,22 @@ function Celulas() {
     const [coLider, setCoLider] = useState("");
     const [membrosSelecionados, setMembrosSelecionados] = useState([]);
 
+    const [dataEncontro, setDataEncontro] = useState("");
+    const [temaRelatorio, setTemaRelatorio] = useState("");
+    const [visitantes, setVisitantes] = useState(0);
+    const [observacoes, setObservacoes] = useState("");
+    const [presencas, setPresencas] = useState([]);
+
     useEffect(() => {
         carregarMembros();
         carregarCelulas();
     }, []);
+
+    useEffect(() => {
+        if (celulaSelecionada?.id && !modoFormulario) {
+            carregarRelatorios(celulaSelecionada.id);
+        }
+    }, [celulaSelecionada, modoFormulario]);
 
     const carregarMembros = async () => {
         try {
@@ -59,6 +76,22 @@ function Celulas() {
         }
     };
 
+    const carregarRelatorios = async (celulaId) => {
+        try {
+            const response = await fetch(`${API_URL}/celulas/${celulaId}/relatorios`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar relatórios da célula");
+            }
+
+            const data = await response.json();
+            setRelatorios(Array.isArray(data) ? data : []);
+        } catch (error) {
+            alert(error.message);
+            setRelatorios([]);
+        }
+    };
+
     const membrosOrdenados = [...membros].sort((a, b) =>
         (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
             sensitivity: "base"
@@ -70,6 +103,14 @@ function Celulas() {
             .toLowerCase()
             .includes(buscaMembro.toLowerCase().trim())
     );
+
+    const membrosDaCelula = Array.isArray(celulaSelecionada?.membros)
+        ? [...celulaSelecionada.membros].sort((a, b) =>
+            (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                sensitivity: "base"
+            })
+        )
+        : [];
 
     const recarregarDados = () => {
         carregarMembros();
@@ -87,6 +128,36 @@ function Celulas() {
         setBuscaMembro("");
         setCelulaSelecionada(null);
         setModoFormulario(false);
+    };
+
+    const limparFormularioRelatorio = () => {
+        setDataEncontro("");
+        setTemaRelatorio("");
+        setVisitantes(0);
+        setObservacoes("");
+        setPresencas([]);
+        setModoRelatorio(false);
+        setRelatorioSelecionado(null);
+    };
+
+    const abrirFormularioRelatorio = () => {
+        if (!celulaSelecionada) return;
+
+        setRelatorioSelecionado(null);
+        setDataEncontro(new Date().toISOString().split("T")[0]);
+        setTemaRelatorio("");
+        setVisitantes(0);
+        setObservacoes("");
+
+        setPresencas(
+            membrosDaCelula.map((membro) => ({
+                membroId: membro.id,
+                nomeMembro: membro.nome,
+                presente: true
+            }))
+        );
+
+        setModoRelatorio(true);
     };
 
     const atualizarCelulaDoMembro = async (membroId, celulaId) => {
@@ -190,6 +261,53 @@ function Celulas() {
         }
     };
 
+    const salvarRelatorio = async () => {
+        if (!celulaSelecionada) return;
+
+        if (!dataEncontro) {
+            alert("Informe a data do encontro");
+            return;
+        }
+
+        if (presencas.length === 0) {
+            alert("A célula não possui membros para registrar presença");
+            return;
+        }
+
+        const dados = {
+            dataEncontro,
+            tema: temaRelatorio,
+            visitantes: Number(visitantes) || 0,
+            observacoes,
+            presencas: presencas.map((presenca) => ({
+                membroId: presenca.membroId,
+                presente: presenca.presente
+            }))
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/celulas/${celulaSelecionada.id}/relatorios`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const text = await response.text();
+
+            if (!response.ok) {
+                throw new Error(text || "Erro ao salvar relatório");
+            }
+
+            alert("Relatório salvo com sucesso!");
+            limparFormularioRelatorio();
+            carregarRelatorios(celulaSelecionada.id);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
     const editarCelula = (celula) => {
         setCelulaSelecionada(celula);
         setNome(celula.nome || "");
@@ -231,12 +349,50 @@ function Celulas() {
         }
     };
 
+    const excluirRelatorio = async (id) => {
+        const confirmar = window.confirm("Deseja excluir este relatório?");
+        if (!confirmar) return;
+
+        try {
+            const response = await fetch(`${API_URL}/celulas/relatorios/${id}`, {
+                method: "DELETE"
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || "Erro ao excluir relatório");
+            }
+
+            alert("Relatório excluído com sucesso!");
+            setRelatorioSelecionado(null);
+            carregarRelatorios(celulaSelecionada.id);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
     const selecionarMembro = (id) => {
         setMembrosSelecionados((selecionados) =>
             selecionados.includes(id)
                 ? selecionados.filter((m) => m !== id)
                 : [...selecionados, id]
         );
+    };
+
+    const alterarPresenca = (membroId) => {
+        setPresencas((lista) =>
+            lista.map((presenca) =>
+                presenca.membroId === membroId
+                    ? { ...presenca, presente: !presenca.presente }
+                    : presenca
+            )
+        );
+    };
+
+    const formatarData = (data) => {
+        if (!data) return "Data não informada";
+
+        return new Date(`${data}T00:00:00`).toLocaleDateString("pt-BR");
     };
 
     return (
@@ -326,7 +482,11 @@ function Celulas() {
                     <div
                         key={celula.id}
                         className="menu-card"
-                        onClick={() => setCelulaSelecionada(celula)}
+                        onClick={() => {
+                            setCelulaSelecionada(celula);
+                            setModoRelatorio(false);
+                            setRelatorioSelecionado(null);
+                        }}
                     >
                         <div className="menu-icon">
                             <Home size={28} />
@@ -350,23 +510,21 @@ function Celulas() {
 
                     <h3>Membros</h3>
 
-                    {!celulaSelecionada.membros || celulaSelecionada.membros.length === 0 ? (
+                    {membrosDaCelula.length === 0 ? (
                         <p>Nenhum membro vinculado.</p>
                     ) : (
                         <ul className="membros-lista">
-                            {[...celulaSelecionada.membros]
-                                .sort((a, b) =>
-                                    (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
-                                        sensitivity: "base"
-                                    })
-                                )
-                                .map((m) => (
-                                    <li key={m.id}>{m.nome}</li>
-                                ))}
+                            {membrosDaCelula.map((m) => (
+                                <li key={m.id}>{m.nome}</li>
+                            ))}
                         </ul>
                     )}
 
                     <div className="button-row">
+                        <button className="primary-button" onClick={abrirFormularioRelatorio}>
+                            Novo Relatório Semanal
+                        </button>
+
                         <button className="secondary-button" onClick={() => editarCelula(celulaSelecionada)}>
                             Editar
                         </button>
@@ -379,6 +537,131 @@ function Celulas() {
                             Fechar
                         </button>
                     </div>
+
+                    {modoRelatorio && (
+                        <div className="relatorio-card">
+                            <h3>Novo Relatório Semanal</h3>
+
+                            <input
+                                type="date"
+                                value={dataEncontro}
+                                onChange={(e) => setDataEncontro(e.target.value)}
+                            />
+
+                            <input
+                                placeholder="Tema do encontro"
+                                value={temaRelatorio}
+                                onChange={(e) => setTemaRelatorio(e.target.value)}
+                            />
+
+                            <input
+                                type="number"
+                                min="0"
+                                placeholder="Quantidade de visitantes"
+                                value={visitantes}
+                                onChange={(e) => setVisitantes(e.target.value)}
+                            />
+
+                            <textarea
+                                placeholder="Observações"
+                                value={observacoes}
+                                onChange={(e) => setObservacoes(e.target.value)}
+                            />
+
+                            <h4>Presença dos membros</h4>
+
+                            {presencas.length === 0 ? (
+                                <p>Nenhum membro vinculado à célula.</p>
+                            ) : (
+                                <div className="membros-checkbox-list">
+                                    {presencas.map((presenca) => (
+                                        <label key={presenca.membroId} className="membro-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                checked={presenca.presente}
+                                                onChange={() => alterarPresenca(presenca.membroId)}
+                                            />
+                                            <span>{presenca.nomeMembro}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="button-row">
+                                <button className="primary-button" onClick={salvarRelatorio}>
+                                    Salvar Relatório
+                                </button>
+
+                                <button className="secondary-button" onClick={limparFormularioRelatorio}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    <h3>Relatórios Semanais</h3>
+
+                    {relatorios.length === 0 ? (
+                        <p>Nenhum relatório cadastrado para esta célula.</p>
+                    ) : (
+                        <div className="relatorios-lista">
+                            {relatorios.map((relatorio) => (
+                                <div key={relatorio.id} className="relatorio-item">
+                                    <div>
+                                        <strong>{formatarData(relatorio.dataEncontro)}</strong>
+                                        <p>{relatorio.tema || "Sem tema informado"}</p>
+                                        <small>
+                                            {relatorio.totalPresentes} presente(s), {relatorio.totalAusentes} ausente(s), {relatorio.visitantes || 0} visitante(s)
+                                        </small>
+                                    </div>
+
+                                    <div className="button-row">
+                                        <button
+                                            className="secondary-button"
+                                            onClick={() => setRelatorioSelecionado(relatorio)}
+                                        >
+                                            Detalhes
+                                        </button>
+
+                                        <button
+                                            className="danger-button"
+                                            onClick={() => excluirRelatorio(relatorio.id)}
+                                        >
+                                            Excluir
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {relatorioSelecionado && (
+                        <div className="relatorio-card">
+                            <h3>Detalhes do Relatório</h3>
+
+                            <p><strong>Data:</strong> {formatarData(relatorioSelecionado.dataEncontro)}</p>
+                            <p><strong>Tema:</strong> {relatorioSelecionado.tema || "Não informado"}</p>
+                            <p><strong>Visitantes:</strong> {relatorioSelecionado.visitantes || 0}</p>
+                            <p><strong>Observações:</strong> {relatorioSelecionado.observacoes || "Nenhuma observação"}</p>
+
+                            <h4>Presenças</h4>
+
+                            <ul className="membros-lista">
+                                {relatorioSelecionado.presencas?.map((presenca) => (
+                                    <li key={presenca.id}>
+                                        {presenca.nomeMembro} — {presenca.presente ? "Presente" : "Ausente"}
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <button
+                                className="secondary-button"
+                                onClick={() => setRelatorioSelecionado(null)}
+                            >
+                                Fechar detalhes
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
