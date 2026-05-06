@@ -24,7 +24,7 @@ function Home() {
         { title: "Kids", icon: Baby, action: () => alert("Em breve") },
         { title: "Eventos", icon: CalendarDays, action: () => alert("Em breve") },
         { title: "Dashboard", icon: BarChart3, action: () => alert("Em breve") },
-        { title: "Inventário", icon: Package, action: () => alert("Em breve") },
+        { title: "Inventário", icon: Package, action: () => navigate("/inventario") },
     ];
 
     const sair = () => {

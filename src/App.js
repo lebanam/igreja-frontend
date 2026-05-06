@@ -9,6 +9,7 @@ import EscalasMinisterios from "./pages/EscalasMinisterios";
 import Financeiro from "./pages/Financeiro";
 import LancamentoFinanceiro from "./pages/LancamentoFinanceiro";
 import RelatorioFinanceiro from "./pages/RelatorioFinanceiro";
+import Inventario from "./pages/Inventario";
 import "./App.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
@@ -122,6 +123,8 @@ function App() {
                         </PrivateRoute>
                     }
                 />
+
+                <Route path="/inventario" element={<Inventario />} />
             </Routes>
         </BrowserRouter>
     );
