@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { API_URL } from "../config/api";
 import { formatarCPF, formatarTelefone } from "../utils/formatadores";
 import { validarEmail, validarCPF } from "../utils/validadores";
@@ -10,6 +10,8 @@ function ListaMembros() {
 
     const [membroDetalhadoId, setMembroDetalhadoId] = useState(null);
     const [membroEditando, setMembroEditando] = useState(null);
+
+    const detalhesRef = useRef(null);
 
     const [nomeEdit, setNomeEdit] = useState("");
     const [emailEdit, setEmailEdit] = useState("");
@@ -28,6 +30,15 @@ function ListaMembros() {
         carregarMembros();
         carregarCelulas();
     }, []);
+
+    const rolarParaDetalhes = () => {
+        setTimeout(() => {
+            detalhesRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 100);
+    };
 
     const carregarMembros = async () => {
         try {
@@ -77,7 +88,7 @@ function ListaMembros() {
 
     const iniciarEdicao = (membro) => {
         setMembroEditando(membro);
-        setMembroDetalhadoId(null);
+        setMembroDetalhadoId(membro.id);
 
         setNomeEdit(membro.nome || "");
         setEmailEdit(membro.email || "");
@@ -91,10 +102,13 @@ function ListaMembros() {
         setMembroDesdeEdit(membro.membroDesde || "");
         setCelulaIdEdit(membro.celula?.id || "");
         setVoluntarioEdit(Boolean(membro.voluntario));
+
+        rolarParaDetalhes();
     };
 
     const cancelarEdicao = () => {
         setMembroEditando(null);
+
         setNomeEdit("");
         setEmailEdit("");
         setCpfEdit("");
@@ -107,6 +121,8 @@ function ListaMembros() {
         setMembroDesdeEdit("");
         setCelulaIdEdit("");
         setVoluntarioEdit(false);
+
+        rolarParaDetalhes();
     };
 
     const salvarEdicao = async () => {
@@ -157,8 +173,14 @@ function ListaMembros() {
             }
 
             alert("Membro atualizado com sucesso!");
+
+            const idEditado = membroEditando.id;
+
             cancelarEdicao();
-            carregarMembros();
+            setMembroDetalhadoId(idEditado);
+            await carregarMembros();
+
+            rolarParaDetalhes();
         } catch (error) {
             console.error("Erro ao salvar edição:", error);
             alert(error.message);
@@ -180,6 +202,7 @@ function ListaMembros() {
 
             alert("Membro excluído com sucesso!");
             setMembroDetalhadoId(null);
+            setMembroEditando(null);
             carregarMembros();
         } catch (error) {
             console.error("Erro ao excluir membro:", error);
@@ -188,125 +211,167 @@ function ListaMembros() {
     };
 
     const alternarDetalhes = (id) => {
-        setMembroDetalhadoId(membroDetalhadoId === id ? null : id);
+        const deveFechar = membroDetalhadoId === id;
+
+        setMembroDetalhadoId(deveFechar ? null : id);
+        setMembroEditando(null);
+
+        if (!deveFechar) {
+            rolarParaDetalhes();
+        }
     };
+
+    const renderizarFormularioEdicao = () => (
+        <div className="detalhe-card" ref={detalhesRef}>
+            <h3>Editando membro</h3>
+
+            <input
+                placeholder="Nome"
+                value={nomeEdit}
+                onChange={(e) => setNomeEdit(e.target.value)}
+            />
+
+            <input
+                placeholder="Email"
+                value={emailEdit}
+                onChange={(e) => setEmailEdit(e.target.value)}
+            />
+
+            <input
+                placeholder="CPF"
+                value={cpfEdit}
+                maxLength={14}
+                onChange={(e) => setCpfEdit(formatarCPF(e.target.value))}
+            />
+
+            <input
+                placeholder="Telefone"
+                value={telefoneEdit}
+                maxLength={15}
+                onChange={(e) => setTelefoneEdit(formatarTelefone(e.target.value))}
+            />
+
+            <label className="field-label">Data de nascimento:</label>
+            <input
+                type="date"
+                value={dataNascimentoEdit}
+                onChange={(e) => setDataNascimentoEdit(e.target.value)}
+            />
+
+            <select value={sexoEdit} onChange={(e) => setSexoEdit(e.target.value)}>
+                <option value="">Sexo</option>
+                <option value="FEMININO">Feminino</option>
+                <option value="MASCULINO">Masculino</option>
+            </select>
+
+            <select
+                value={estadoCivilEdit}
+                onChange={(e) => setEstadoCivilEdit(e.target.value)}
+            >
+                <option value="">Estado civil</option>
+                <option value="SOLTEIRO">Solteiro(a)</option>
+                <option value="CASADO">Casado(a)</option>
+                <option value="DIVORCIADO">Divorciado(a)</option>
+                <option value="VIUVO">Viúvo(a)</option>
+            </select>
+
+            <textarea
+                placeholder="Endereço"
+                value={enderecoEdit}
+                onChange={(e) => setEnderecoEdit(e.target.value)}
+            />
+
+            <label className="checkbox-field">
+                <input
+                    type="checkbox"
+                    checked={batizadoEdit}
+                    onChange={(e) => setBatizadoEdit(e.target.checked)}
+                />
+                <span>Batizado</span>
+            </label>
+
+            <label className="field-label">Membro desde:</label>
+
+            <input
+                type="date"
+                value={membroDesdeEdit}
+                onChange={(e) => setMembroDesdeEdit(e.target.value)}
+            />
+
+            <label className="field-label">Célula:</label>
+
+            <select
+                value={celulaIdEdit}
+                onChange={(e) => setCelulaIdEdit(e.target.value)}
+            >
+                <option value="">Sem célula</option>
+
+                {celulas.map((celula) => (
+                    <option key={celula.id} value={celula.id}>
+                        {celula.nome}
+                    </option>
+                ))}
+            </select>
+
+            <label className="checkbox-field">
+                <input
+                    type="checkbox"
+                    checked={voluntarioEdit}
+                    onChange={(e) => setVoluntarioEdit(e.target.checked)}
+                />
+                <span>Voluntário</span>
+            </label>
+
+            <div className="button-row">
+                <button className="primary-button" onClick={salvarEdicao}>
+                    Salvar alterações
+                </button>
+
+                <button className="secondary-button" onClick={cancelarEdicao}>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    );
+
+    const renderizarDetalhes = (m) => (
+        <div className="detalhe-card" ref={detalhesRef}>
+            <h3>{m.nome}</h3>
+
+            <p><strong>Email:</strong> {m.email}</p>
+            <p><strong>CPF:</strong> {m.cpf}</p>
+            <p><strong>Telefone:</strong> {m.telefone || "-"}</p>
+            <p><strong>Data de nascimento:</strong> {formatarData(m.dataNascimento)}</p>
+            <p><strong>Idade:</strong> {m.idade ?? "-"}</p>
+            <p><strong>Sexo:</strong> {formatarOpcao(m.sexo)}</p>
+            <p><strong>Estado civil:</strong> {formatarOpcao(m.estadoCivil)}</p>
+            <p><strong>Endereço:</strong> {m.endereco || "-"}</p>
+            <p><strong>Batizado:</strong> {m.batizado ? "Sim" : "Não"}</p>
+            <p><strong>Membro desde:</strong> {formatarData(m.membroDesde)}</p>
+            <p><strong>Célula:</strong> {m.celula ? m.celula.nome : "-"}</p>
+            <p><strong>Voluntário:</strong> {m.voluntario ? "Sim" : "Não"}</p>
+
+            <div className="button-row">
+                <button
+                    className="secondary-button"
+                    onClick={() => iniciarEdicao(m)}
+                >
+                    Editar
+                </button>
+
+                <button
+                    className="danger-button"
+                    onClick={() => excluir(m.id)}
+                >
+                    Excluir
+                </button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="page-container">
             <h2>Lista de Membros</h2>
-
-            {membroEditando && (
-                <div className="form-card">
-                    <h3>Editando membro</h3>
-
-                    <input
-                        placeholder="Nome"
-                        value={nomeEdit}
-                        onChange={(e) => setNomeEdit(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="Email"
-                        value={emailEdit}
-                        onChange={(e) => setEmailEdit(e.target.value)}
-                    />
-
-                    <input
-                        placeholder="CPF"
-                        value={cpfEdit}
-                        maxLength={14}
-                        onChange={(e) => setCpfEdit(formatarCPF(e.target.value))}
-                    />
-
-                    <input
-                        placeholder="Telefone"
-                        value={telefoneEdit}
-                        maxLength={15}
-                        onChange={(e) => setTelefoneEdit(formatarTelefone(e.target.value))}
-                    />
-
-                    <label className="field-label">Data de nascimento:</label>
-                    <input
-                        type="date"
-                        value={dataNascimentoEdit}
-                        onChange={(e) => setDataNascimentoEdit(e.target.value)}
-                    />
-
-                    <select value={sexoEdit} onChange={(e) => setSexoEdit(e.target.value)}>
-                        <option value="">Sexo</option>
-                        <option value="FEMININO">Feminino</option>
-                        <option value="MASCULINO">Masculino</option>
-                    </select>
-
-                    <select
-                        value={estadoCivilEdit}
-                        onChange={(e) => setEstadoCivilEdit(e.target.value)}
-                    >
-                        <option value="">Estado civil</option>
-                        <option value="SOLTEIRO">Solteiro(a)</option>
-                        <option value="CASADO">Casado(a)</option>
-                        <option value="DIVORCIADO">Divorciado(a)</option>
-                        <option value="VIUVO">Viúvo(a)</option>
-                    </select>
-
-                    <textarea
-                        placeholder="Endereço"
-                        value={enderecoEdit}
-                        onChange={(e) => setEnderecoEdit(e.target.value)}
-                    />
-
-                    <label className="checkbox-field">
-                        <input
-                            type="checkbox"
-                            checked={batizadoEdit}
-                            onChange={(e) => setBatizadoEdit(e.target.checked)}
-                        />
-                        <span>Batizado</span>
-                    </label>
-
-                    <label className="field-label">Membro desde:</label>
-
-                    <input
-                        type="date"
-                        value={membroDesdeEdit}
-                        onChange={(e) => setMembroDesdeEdit(e.target.value)}
-                    />
-
-                    <label className="field-label">Célula:</label>
-
-                    <select
-                        value={celulaIdEdit}
-                        onChange={(e) => setCelulaIdEdit(e.target.value)}
-                    >
-                        <option value="">Sem célula</option>
-
-                        {celulas.map((celula) => (
-                            <option key={celula.id} value={celula.id}>
-                                {celula.nome}
-                            </option>
-                        ))}
-                    </select>
-
-                    <label className="checkbox-field">
-                        <input
-                            type="checkbox"
-                            checked={voluntarioEdit}
-                            onChange={(e) => setVoluntarioEdit(e.target.checked)}
-                        />
-                        <span>Voluntário</span>
-                    </label>
-
-                    <div className="button-row">
-                        <button className="primary-button" onClick={salvarEdicao}>
-                            Salvar alterações
-                        </button>
-
-                        <button className="secondary-button" onClick={cancelarEdicao}>
-                            Cancelar
-                        </button>
-                    </div>
-                </div>
-            )}
 
             <div className="table-container">
                 <table className="data-table">
@@ -349,38 +414,9 @@ function ListaMembros() {
                             {membroDetalhadoId === m.id && (
                                 <tr className="detalhe-row">
                                     <td colSpan="9">
-                                        <div className="detalhe-card">
-                                            <h3>{m.nome}</h3>
-
-                                            <p><strong>Email:</strong> {m.email}</p>
-                                            <p><strong>CPF:</strong> {m.cpf}</p>
-                                            <p><strong>Telefone:</strong> {m.telefone || "-"}</p>
-                                            <p><strong>Data de nascimento:</strong> {formatarData(m.dataNascimento)}</p>
-                                            <p><strong>Idade:</strong> {m.idade ?? "-"}</p>
-                                            <p><strong>Sexo:</strong> {formatarOpcao(m.sexo)}</p>
-                                            <p><strong>Estado civil:</strong> {formatarOpcao(m.estadoCivil)}</p>
-                                            <p><strong>Endereço:</strong> {m.endereco || "-"}</p>
-                                            <p><strong>Batizado:</strong> {m.batizado ? "Sim" : "Não"}</p>
-                                            <p><strong>Membro desde:</strong> {formatarData(m.membroDesde)}</p>
-                                            <p><strong>Célula:</strong> {m.celula ? m.celula.nome : "-"}</p>
-                                            <p><strong>Voluntário:</strong> {m.voluntario ? "Sim" : "Não"}</p>
-
-                                            <div className="button-row">
-                                                <button
-                                                    className="secondary-button"
-                                                    onClick={() => iniciarEdicao(m)}
-                                                >
-                                                    Editar
-                                                </button>
-
-                                                <button
-                                                    className="danger-button"
-                                                    onClick={() => excluir(m.id)}
-                                                >
-                                                    Excluir
-                                                </button>
-                                            </div>
-                                        </div>
+                                        {membroEditando?.id === m.id
+                                            ? renderizarFormularioEdicao()
+                                            : renderizarDetalhes(m)}
                                     </td>
                                 </tr>
                             )}
