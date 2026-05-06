@@ -1,65 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { CalendarDays } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Home } from "lucide-react";
 import "./Celulas.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
 
-function EscalasMinisterio() {
+function Celulas() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { ministerioId } = useParams();
 
-    const ministerio = location.state?.ministerio;
-
-    const [escalas, setEscalas] = useState([]);
+    const [celulas, setCelulas] = useState([]);
     const [membros, setMembros] = useState([]);
     const [modoFormulario, setModoFormulario] = useState(false);
-    const [escalaSelecionada, setEscalaSelecionada] = useState(null);
+    const [celulaSelecionada, setCelulaSelecionada] = useState(null);
     const [buscaMembro, setBuscaMembro] = useState("");
 
-    const [data, setData] = useState("");
-    const [horario, setHorario] = useState("");
-    const [titulo, setTitulo] = useState("");
-    const [observacoes, setObservacoes] = useState("");
-    const [participantes, setParticipantes] = useState([
-        { funcao: "", membroId: "" }
-    ]);
+    const [nome, setNome] = useState("");
+    const [tema, setTema] = useState("");
+    const [quando, setQuando] = useState("");
+    const [onde, setOnde] = useState("");
+    const [lider, setLider] = useState("");
+    const [coLider, setCoLider] = useState("");
+    const [membrosSelecionados, setMembrosSelecionados] = useState([]);
 
-    const formatarData = (data) => {
-        if (!data) return "Não informado";
+    useEffect(() => {
+        carregarMembros();
+        carregarCelulas();
+    }, []);
 
-        const d = new Date(`${data}T00:00:00`);
-
-        const diaSemana = d.toLocaleDateString("pt-BR", {
-            weekday: "long"
-        });
-
-        const dataFormatada = d.toLocaleDateString("pt-BR");
-
-        const diaCapitalizado =
-            diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1);
-
-        return `${diaCapitalizado}, ${dataFormatada}`;
-    };
-
-    const carregarEscalas = useCallback(async () => {
-        try {
-            const response = await fetch(`${API_URL}/ministerios/${ministerioId}/escalas`);
-
-            if (!response.ok) {
-                throw new Error("Erro ao carregar escalas");
-            }
-
-            const data = await response.json();
-            setEscalas(Array.isArray(data) ? data : []);
-        } catch (error) {
-            alert(error.message);
-            setEscalas([]);
-        }
-    }, [ministerioId]);
-
-    const carregarMembros = useCallback(async () => {
+    const carregarMembros = async () => {
         try {
             const response = await fetch(`${API_URL}/membros`);
 
@@ -73,90 +41,92 @@ function EscalasMinisterio() {
             alert(error.message);
             setMembros([]);
         }
-    }, []);
+    };
 
-    useEffect(() => {
-        carregarEscalas();
+    const carregarCelulas = async () => {
+        try {
+            const response = await fetch(`${API_URL}/celulas`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar células");
+            }
+
+            const data = await response.json();
+            setCelulas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            alert(error.message);
+            setCelulas([]);
+        }
+    };
+
+    const membrosOrdenados = [...membros].sort((a, b) =>
+        (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+            sensitivity: "base"
+        })
+    );
+
+    const membrosFiltrados = membrosOrdenados.filter((membro) =>
+        (membro.nome || "")
+            .toLowerCase()
+            .includes(buscaMembro.toLowerCase().trim())
+    );
+
+    const recarregarDados = () => {
         carregarMembros();
-    }, [carregarEscalas, carregarMembros]);
+        carregarCelulas();
+    };
 
     const limparFormulario = () => {
-        setData("");
-        setHorario("");
-        setTitulo("");
-        setObservacoes("");
-        setParticipantes([{ funcao: "", membroId: "" }]);
-        setEscalaSelecionada(null);
+        setNome("");
+        setTema("");
+        setQuando("");
+        setOnde("");
+        setLider("");
+        setCoLider("");
+        setMembrosSelecionados([]);
+        setBuscaMembro("");
+        setCelulaSelecionada(null);
         setModoFormulario(false);
     };
 
-    const adicionarParticipante = () => {
-        setParticipantes([
-            ...participantes,
-            { funcao: "", membroId: "" }
-        ]);
-    };
-
-    const removerParticipante = (index) => {
-        const novaLista = participantes.filter((_, i) => i !== index);
-
-        setParticipantes(
-            novaLista.length > 0 ? novaLista : [{ funcao: "", membroId: "" }]
-        );
-    };
-
-    const alterarParticipante = (index, campo, valor) => {
-        const novaLista = participantes.map((participante, i) => {
-            if (i !== index) return participante;
-
-            return {
-                ...participante,
-                [campo]: valor
-            };
+    const atualizarCelulaDoMembro = async (membroId, celulaId) => {
+        const response = await fetch(`${API_URL}/membros/${membroId}/celula`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ celulaId })
         });
 
-        setParticipantes(novaLista);
-    };
+        const text = await response.text();
 
-    const obterParticipantesValidos = () => {
-        return participantes
-            .filter((participante) => participante.funcao.trim() && participante.membroId)
-            .map((participante) => ({
-                funcao: participante.funcao.trim(),
-                membroId: Number(participante.membroId)
-            }));
-    };
-
-    const salvarEscala = async () => {
-        const participantesValidos = obterParticipantesValidos();
-
-        if (!data || !titulo) {
-            alert("Preencha data e título");
-            return;
+        if (!response.ok) {
+            throw new Error(text || "Erro ao atualizar célula do membro");
         }
+    };
 
-        if (participantesValidos.length === 0) {
-            alert("Adicione pelo menos uma função com membro");
+    const salvarCelula = async () => {
+        if (!nome || !tema || !quando || !onde || !lider) {
+            alert("Preencha nome, tema, quando, onde e líder");
             return;
         }
 
         const dados = {
-            data,
-            horario: horario || null,
-            titulo,
-            textoEscala: "",
-            observacoes,
-            ministerioId: Number(ministerioId),
-            participantes: participantesValidos
+            nome,
+            tema,
+            quando,
+            onde,
+            lider,
+            coLider
         };
 
         try {
-            const url = escalaSelecionada
-                ? `${API_URL}/escalas/${escalaSelecionada.id}`
-                : `${API_URL}/escalas`;
+            const url = celulaSelecionada
+                ? `${API_URL}/celulas/${celulaSelecionada.id}`
+                : `${API_URL}/celulas`;
 
             const response = await fetch(url, {
-                method: escalaSelecionada ? "PUT" : "POST",
+                method: celulaSelecionada ? "PUT" : "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -166,166 +136,181 @@ function EscalasMinisterio() {
             const text = await response.text();
 
             if (!response.ok) {
-                throw new Error(text || "Erro ao salvar escala");
+                throw new Error(text || "Erro ao salvar célula");
             }
 
-            alert("Escala salva com sucesso!");
+            const celulaSalva = JSON.parse(text);
+            const celulaId = celulaSalva.id;
+
+            const membrosMovidos = membros.filter(
+                (m) =>
+                    membrosSelecionados.includes(String(m.id)) &&
+                    m.celula &&
+                    m.celula.id !== celulaId
+            );
+
+            if (membrosMovidos.length > 0) {
+                const nomes = membrosMovidos
+                    .map((m) => `${m.nome} (${m.celula.nome})`)
+                    .join(", ");
+
+                const confirmar = window.confirm(
+                    `Os seguintes membros já estão em outra célula e serão movidos para esta célula: ${nomes}. Deseja continuar?`
+                );
+
+                if (!confirmar) return;
+            }
+
+            const membrosAtuaisDaCelula = membros.filter(
+                (m) => m.celula?.id === celulaId
+            );
+
+            const membrosParaAdicionar = membros.filter((m) =>
+                membrosSelecionados.includes(String(m.id))
+            );
+
+            const membrosParaRemover = membrosAtuaisDaCelula.filter(
+                (m) => !membrosSelecionados.includes(String(m.id))
+            );
+
+            await Promise.all([
+                ...membrosParaAdicionar.map((m) =>
+                    atualizarCelulaDoMembro(m.id, celulaId)
+                ),
+                ...membrosParaRemover.map((m) =>
+                    atualizarCelulaDoMembro(m.id, null)
+                )
+            ]);
+
+            alert("Célula salva com sucesso!");
             limparFormulario();
-            carregarEscalas();
+            recarregarDados();
         } catch (error) {
             alert(error.message);
         }
     };
 
-    const editarEscala = (escala) => {
-        const participantesEditaveis =
-            escala.participantes && escala.participantes.length > 0
-                ? escala.participantes.map((participante) => ({
-                    funcao: participante.funcao || "",
-                    membroId: participante.membroId || ""
-                }))
-                : [{ funcao: "", membroId: "" }];
+    const editarCelula = (celula) => {
+        setCelulaSelecionada(celula);
+        setNome(celula.nome || "");
+        setTema(celula.tema || "");
+        setQuando(celula.quando || "");
+        setOnde(celula.onde || "");
+        setLider(celula.lider || "");
+        setCoLider(celula.coLider || "");
+        setBuscaMembro("");
 
-        setEscalaSelecionada(escala);
-        setData(escala.data || "");
-        setHorario(escala.horario || "");
-        setTitulo(escala.titulo || "");
-        setObservacoes(escala.observacoes || "");
-        setParticipantes(participantesEditaveis);
+        setMembrosSelecionados(
+            Array.isArray(celula.membros)
+                ? celula.membros.map((m) => String(m.id))
+                : []
+        );
+
         setModoFormulario(true);
     };
 
-    const excluirEscala = async (id) => {
-        const confirmar = window.confirm("Deseja excluir esta escala?");
+    const excluirCelula = async (id) => {
+        const confirmar = window.confirm("Deseja excluir esta célula?");
         if (!confirmar) return;
 
         try {
-            const response = await fetch(`${API_URL}/escalas/${id}`, {
+            const response = await fetch(`${API_URL}/celulas/${id}`, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
                 const text = await response.text();
-                throw new Error(text || "Erro ao excluir escala");
+                throw new Error(text || "Erro ao excluir célula");
             }
 
-            alert("Escala excluída com sucesso!");
-            setEscalaSelecionada(null);
-            carregarEscalas();
+            alert("Célula excluída com sucesso!");
+            setCelulaSelecionada(null);
+            recarregarDados();
         } catch (error) {
             alert(error.message);
         }
     };
 
-    const escalaTemMembroBuscado = (escala) => {
-        if (!buscaMembro.trim()) return true;
-
-        const termo = buscaMembro.toLowerCase();
-
-        return escala.participantes?.some((participante) =>
-            participante.membroNome?.toLowerCase().includes(termo)
+    const selecionarMembro = (id) => {
+        setMembrosSelecionados((selecionados) =>
+            selecionados.includes(id)
+                ? selecionados.filter((m) => m !== id)
+                : [...selecionados, id]
         );
     };
 
-    const escalasFiltradas = escalas.filter(escalaTemMembroBuscado);
-
     return (
         <div className="page">
-            <button className="back-button" onClick={() => navigate("/ministerios")}>
-                Voltar
+            <button className="back-button" onClick={() => navigate("/home")}>
+                Início
             </button>
 
-            <h1 className="page-title">
-                Escalas {ministerio?.nome ? `- ${ministerio.nome}` : ""}
-            </h1>
+            <h1 className="page-title">Células</h1>
 
-            <div className="button-row">
-                <button className="primary-button" onClick={() => setModoFormulario(true)}>
-                    Nova Escala
-                </button>
-
-                <input
-                    className="search-input"
-                    placeholder="Buscar membro escalado..."
-                    value={buscaMembro}
-                    onChange={(e) => setBuscaMembro(e.target.value)}
-                />
-            </div>
+            <button className="primary-button" onClick={() => setModoFormulario(true)}>
+                Nova Célula
+            </button>
 
             {modoFormulario && (
                 <div className="form-card">
-                    <h2>{escalaSelecionada ? "Editar Escala" : "Cadastrar Escala"}</h2>
+                    <h2>{celulaSelecionada ? "Editar Célula" : "Cadastrar Célula"}</h2>
 
-                    <input
-                        type="date"
-                        value={data}
-                        onChange={(e) => setData(e.target.value)}
-                    />
+                    <input placeholder="Nome da célula" value={nome} onChange={(e) => setNome(e.target.value)} />
+                    <input placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
+                    <input placeholder="Quando" value={quando} onChange={(e) => setQuando(e.target.value)} />
+                    <input placeholder="Onde" value={onde} onChange={(e) => setOnde(e.target.value)} />
+                    <input placeholder="Líder" value={lider} onChange={(e) => setLider(e.target.value)} />
+                    <input placeholder="Co-líder" value={coLider} onChange={(e) => setCoLider(e.target.value)} />
 
-                    <input
-                        type="time"
-                        value={horario}
-                        onChange={(e) => setHorario(e.target.value)}
-                    />
+                    <h3>Membros</h3>
 
-                    <input
-                        placeholder="Título"
-                        value={titulo}
-                        onChange={(e) => setTitulo(e.target.value)}
-                    />
-
-                    <h3>Funções da escala</h3>
-
-                    {participantes.map((participante, index) => (
-                        <div key={index} className="button-row">
+                    {membros.length === 0 ? (
+                        <p>Nenhum membro cadastrado ainda.</p>
+                    ) : (
+                        <>
                             <input
-                                placeholder="Função. Ex: Vocal, Recepção, Professor"
-                                value={participante.funcao}
-                                onChange={(e) =>
-                                    alterarParticipante(index, "funcao", e.target.value)
-                                }
+                                className="search-input"
+                                placeholder="Buscar membro pelo nome..."
+                                value={buscaMembro}
+                                onChange={(e) => setBuscaMembro(e.target.value)}
                             />
 
-                            <select
-                                value={participante.membroId}
-                                onChange={(e) =>
-                                    alterarParticipante(index, "membroId", e.target.value)
-                                }
-                            >
-                                <option value="">Selecione um membro</option>
-                                {membros.map((membro) => (
-                                    <option key={membro.id} value={membro.id}>
-                                        {membro.nome}
-                                    </option>
-                                ))}
-                            </select>
+                            {membrosFiltrados.length === 0 ? (
+                                <p>Nenhum membro encontrado.</p>
+                            ) : (
+                                <div className="membros-checkbox-list">
+                                    {membrosFiltrados.map((m) => {
+                                        const estaEmOutraCelula =
+                                            m.celula &&
+                                            celulaSelecionada &&
+                                            m.celula.id !== celulaSelecionada.id;
 
-                            <button
-                                className="danger-button"
-                                type="button"
-                                onClick={() => removerParticipante(index)}
-                            >
-                                Remover
-                            </button>
-                        </div>
-                    ))}
+                                        return (
+                                            <label key={m.id} className="membro-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={membrosSelecionados.includes(String(m.id))}
+                                                    onChange={() => selecionarMembro(String(m.id))}
+                                                />
 
-                    <button
-                        className="secondary-button"
-                        type="button"
-                        onClick={adicionarParticipante}
-                    >
-                        + Adicionar função
-                    </button>
-
-                    <textarea
-                        placeholder="Observações"
-                        value={observacoes}
-                        onChange={(e) => setObservacoes(e.target.value)}
-                    />
+                                                <span className="membro-label">
+                                                    {m.nome}
+                                                    {estaEmOutraCelula && (
+                                                        <small className="membro-aviso">
+                                                            {" "}— será movido de {m.celula.nome}
+                                                        </small>
+                                                    )}
+                                                </span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </>
+                    )}
 
                     <div className="button-row">
-                        <button className="primary-button" onClick={salvarEscala}>
+                        <button className="primary-button" onClick={salvarCelula}>
                             Salvar
                         </button>
 
@@ -337,75 +322,60 @@ function EscalasMinisterio() {
             )}
 
             <div className="card-grid celulas-grid">
-                {escalasFiltradas.map((escala) => (
+                {celulas.map((celula) => (
                     <div
-                        key={escala.id}
+                        key={celula.id}
                         className="menu-card"
-                        onClick={() => setEscalaSelecionada(escala)}
+                        onClick={() => setCelulaSelecionada(celula)}
                     >
                         <div className="menu-icon">
-                            <CalendarDays size={28} />
+                            <Home size={28} />
                         </div>
-
-                        <strong>{escala.titulo}</strong>
-                        <p>{formatarData(escala.data)}</p>
-                        <small>{escala.horario || "Horário não informado"}</small>
-
-                        {escala.participantes?.length > 0 && (
-                            <div>
-                                {escala.participantes.map((participante, index) => (
-                                    <small key={index}>
-                                        <strong>{participante.funcao}:</strong>{" "}
-                                        {participante.membroNome}
-                                        <br />
-                                    </small>
-                                ))}
-                            </div>
-                        )}
+                        <strong>{celula.nome}</strong>
+                        <p>{celula.tema}</p>
+                        <small>{celula.membros?.length || 0} membro(s)</small>
                     </div>
                 ))}
             </div>
 
-            {escalaSelecionada && !modoFormulario && (
+            {celulaSelecionada && !modoFormulario && (
                 <div className="form-card">
-                    <h2>{escalaSelecionada.titulo}</h2>
+                    <h2>{celulaSelecionada.nome}</h2>
 
-                    <p><strong>Data:</strong> {formatarData(escalaSelecionada.data)}</p>
-                    <p><strong>Horário:</strong> {escalaSelecionada.horario || "Não informado"}</p>
+                    <p><strong>Tema:</strong> {celulaSelecionada.tema || "Não informado"}</p>
+                    <p><strong>Quando:</strong> {celulaSelecionada.quando || "Não informado"}</p>
+                    <p><strong>Onde:</strong> {celulaSelecionada.onde || "Não informado"}</p>
+                    <p><strong>Líder:</strong> {celulaSelecionada.lider || "Não informado"}</p>
+                    <p><strong>Co-líder:</strong> {celulaSelecionada.coLider || "Não informado"}</p>
 
-                    <h3>Escala</h3>
+                    <h3>Membros</h3>
 
-                    <ul className="membros-lista">
-                        {escalaSelecionada.participantes?.map((participante, index) => (
-                            <li key={index}>
-                                <strong>{participante.funcao}</strong> -{" "}
-                                {participante.membroNome}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <h3>Observações</h3>
-                    <p>{escalaSelecionada.observacoes || "Nenhuma observação"}</p>
+                    {!celulaSelecionada.membros || celulaSelecionada.membros.length === 0 ? (
+                        <p>Nenhum membro vinculado.</p>
+                    ) : (
+                        <ul className="membros-lista">
+                            {[...celulaSelecionada.membros]
+                                .sort((a, b) =>
+                                    (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                                        sensitivity: "base"
+                                    })
+                                )
+                                .map((m) => (
+                                    <li key={m.id}>{m.nome}</li>
+                                ))}
+                        </ul>
+                    )}
 
                     <div className="button-row">
-                        <button
-                            className="secondary-button"
-                            onClick={() => editarEscala(escalaSelecionada)}
-                        >
+                        <button className="secondary-button" onClick={() => editarCelula(celulaSelecionada)}>
                             Editar
                         </button>
 
-                        <button
-                            className="danger-button"
-                            onClick={() => excluirEscala(escalaSelecionada.id)}
-                        >
+                        <button className="danger-button" onClick={() => excluirCelula(celulaSelecionada.id)}>
                             Excluir
                         </button>
 
-                        <button
-                            className="secondary-button"
-                            onClick={() => setEscalaSelecionada(null)}
-                        >
+                        <button className="secondary-button" onClick={() => setCelulaSelecionada(null)}>
                             Fechar
                         </button>
                     </div>
@@ -415,4 +385,4 @@ function EscalasMinisterio() {
     );
 }
 
-export default EscalasMinisterio;
+export default Celulas;
