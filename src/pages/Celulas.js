@@ -12,6 +12,7 @@ function Celulas() {
     const [membros, setMembros] = useState([]);
     const [modoFormulario, setModoFormulario] = useState(false);
     const [celulaSelecionada, setCelulaSelecionada] = useState(null);
+    const [buscaMembro, setBuscaMembro] = useState("");
 
     const [nome, setNome] = useState("");
     const [tema, setTema] = useState("");
@@ -58,6 +59,18 @@ function Celulas() {
         }
     };
 
+    const membrosOrdenados = [...membros].sort((a, b) =>
+        (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+            sensitivity: "base"
+        })
+    );
+
+    const membrosFiltrados = membrosOrdenados.filter((membro) =>
+        (membro.nome || "")
+            .toLowerCase()
+            .includes(buscaMembro.toLowerCase().trim())
+    );
+
     const recarregarDados = () => {
         carregarMembros();
         carregarCelulas();
@@ -71,6 +84,7 @@ function Celulas() {
         setLider("");
         setCoLider("");
         setMembrosSelecionados([]);
+        setBuscaMembro("");
         setCelulaSelecionada(null);
         setModoFormulario(false);
     };
@@ -184,6 +198,7 @@ function Celulas() {
         setOnde(celula.onde || "");
         setLider(celula.lider || "");
         setCoLider(celula.coLider || "");
+        setBuscaMembro("");
 
         setMembrosSelecionados(
             Array.isArray(celula.membros)
@@ -252,33 +267,46 @@ function Celulas() {
                     {membros.length === 0 ? (
                         <p>Nenhum membro cadastrado ainda.</p>
                     ) : (
-                        <div className="membros-checkbox-list">
-                            {membros.map((m) => {
-                                const estaEmOutraCelula =
-                                    m.celula &&
-                                    celulaSelecionada &&
-                                    m.celula.id !== celulaSelecionada.id;
+                        <>
+                            <input
+                                className="search-input"
+                                placeholder="Buscar membro pelo nome..."
+                                value={buscaMembro}
+                                onChange={(e) => setBuscaMembro(e.target.value)}
+                            />
 
-                                return (
-                                    <label key={m.id} className="membro-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            checked={membrosSelecionados.includes(String(m.id))}
-                                            onChange={() => selecionarMembro(String(m.id))}
-                                        />
+                            {membrosFiltrados.length === 0 ? (
+                                <p>Nenhum membro encontrado.</p>
+                            ) : (
+                                <div className="membros-checkbox-list">
+                                    {membrosFiltrados.map((m) => {
+                                        const estaEmOutraCelula =
+                                            m.celula &&
+                                            celulaSelecionada &&
+                                            m.celula.id !== celulaSelecionada.id;
 
-                                        <span className="membro-label">
-        {m.nome}
-                                            {estaEmOutraCelula && (
-                                                <small className="membro-aviso">
-                                                    {" "}— será movido de {m.celula.nome}
-                                                </small>
-                                            )}
-    </span>
-                                    </label>
-                                );
-                            })}
-                        </div>
+                                        return (
+                                            <label key={m.id} className="membro-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={membrosSelecionados.includes(String(m.id))}
+                                                    onChange={() => selecionarMembro(String(m.id))}
+                                                />
+
+                                                <span className="membro-label">
+                                                    {m.nome}
+                                                    {estaEmOutraCelula && (
+                                                        <small className="membro-aviso">
+                                                            {" "}— será movido de {m.celula.nome}
+                                                        </small>
+                                                    )}
+                                                </span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </>
                     )}
 
                     <div className="button-row">
@@ -326,9 +354,15 @@ function Celulas() {
                         <p>Nenhum membro vinculado.</p>
                     ) : (
                         <ul className="membros-lista">
-                            {celulaSelecionada.membros.map((m) => (
-                                <li key={m.id}>{m.nome}</li>
-                            ))}
+                            {[...celulaSelecionada.membros]
+                                .sort((a, b) =>
+                                    (a.nome || "").localeCompare(b.nome || "", "pt-BR", {
+                                        sensitivity: "base"
+                                    })
+                                )
+                                .map((m) => (
+                                    <li key={m.id}>{m.nome}</li>
+                                ))}
                         </ul>
                     )}
 
