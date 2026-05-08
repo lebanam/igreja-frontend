@@ -15,19 +15,23 @@
     border-bottom: 1px solid var(--bg-card-hover);
     padding: 0 56px;
     display: grid;
-    grid-template-columns: 240px auto 1fr auto;
+    grid-template-columns: 220px 1fr 260px;
     align-items: center;
     gap: 24px;
 }
 
 .topbar-left {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
 }
 
 .topbar-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     min-width: 0;
+    text-align: center;
 }
 
 .topbar-center strong {
@@ -62,13 +66,10 @@
     background: var(--bg-card-hover);
 }
 
-.topbar-spacer {
-    min-width: 0;
-}
-
 .topbar-right {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 16px;
 }
 
@@ -188,8 +189,10 @@
         gap: 14px;
     }
 
-    .topbar-home-button {
-        width: fit-content;
+    .topbar-left,
+    .topbar-center,
+    .topbar-right {
+        justify-content: center;
     }
 
     .topbar-right {

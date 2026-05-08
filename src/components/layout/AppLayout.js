@@ -11,7 +11,7 @@ function AppLayout() {
     };
 
     const igreja = JSON.parse(localStorage.getItem("igreja")) || {
-        nome: "Igreja360",
+        nome: "Minha Igreja",
         logoUrl: ""
     };
 
@@ -25,21 +25,19 @@ function AppLayout() {
             <div className="main-shell">
                 <header className="topbar">
                     <div className="topbar-left">
-                        <div className="topbar-center">
-                            <strong>{igreja.nome}</strong>
-                            <span>Sistema de gestão ministerial</span>
-                        </div>
+                        <button
+                            className="topbar-home-button"
+                            onClick={() => navigate("/home")}
+                        >
+                            <Home size={18} />
+                            Início
+                        </button>
                     </div>
 
-                    <button
-                        className="topbar-home-button"
-                        onClick={() => navigate("/home")}
-                    >
-                        <Home size={18} />
-                        Início
-                    </button>
-
-                    <div className="topbar-spacer" />
+                    <div className="topbar-center">
+                        <strong>{igreja.nome || "Minha Igreja"}</strong>
+                        <span>Igreja360 • Sistema de gestão ministerial</span>
+                    </div>
 
                     <div className="topbar-right">
                         <div className="topbar-user">
