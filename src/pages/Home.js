@@ -35,14 +35,7 @@ function Home() {
     return (
         <main className="home-page">
             <header className="home-header">
-                <div>
-                    <h1> </h1>
-                    <p>  </p>
-                </div>
 
-                <button className="logout-button" onClick={sair}>
-                    Sair
-                </button>
             </header>
 
             <section className="home-grid">

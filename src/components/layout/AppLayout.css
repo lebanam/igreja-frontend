@@ -13,14 +13,16 @@
     height: 72px;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--bg-card-hover);
-    padding: 0 28px;
+    padding: 0 40px;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 20px;
 }
 
+
 .topbar-home-button {
+    margin-left: 12px;
     border: none;
     background: var(--bg-secondary);
     color: var(--text-primary);
