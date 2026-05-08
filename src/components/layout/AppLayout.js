@@ -38,9 +38,23 @@ function AppLayout() {
                             Início
                         </button>
 
-                        <strong className="topbar-church-name">
-                            {igreja.nome || "Minha Igreja"}
-                        </strong>
+                        <div className="topbar-church">
+                            {igreja.logoUrl ? (
+                                <img
+                                    src={igreja.logoUrl}
+                                    alt="Logo da igreja"
+                                    className="topbar-church-logo"
+                                />
+                            ) : (
+                                <div className="topbar-church-placeholder">
+                                    {(igreja.nome || "I").charAt(0)}
+                                </div>
+                            )}
+
+                            <strong className="topbar-church-name">
+                                {igreja.nome || "Minha Igreja"}
+                            </strong>
+                        </div>
                     </div>
 
                     <div className="topbar-right">

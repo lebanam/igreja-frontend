@@ -65,6 +65,36 @@
     background: var(--bg-card-hover);
 }
 
+.topbar-church {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.topbar-church-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid var(--bg-card-hover);
+    background: white;
+    flex-shrink: 0;
+}
+
+.topbar-church-placeholder {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
 .topbar-church-name {
     color: var(--text-primary);
     font-size: 18px;
