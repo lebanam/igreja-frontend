@@ -1,15 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import {
-    Home,
-    Users,
-    Network,
-    Music,
-    CalendarDays,
-    Wallet,
-    Boxes,
-    Settings,
-    LogOut
-} from "lucide-react";
+import { Home, Settings, LogOut, Menu } from "lucide-react";
 import "./AppLayout.css";
 
 function AppLayout() {
@@ -33,74 +23,56 @@ function AppLayout() {
     return (
         <div className="app-layout">
             <aside className="sidebar">
-                <div className="sidebar-brand">
-                    {igreja.logoUrl ? (
-                        <img src={igreja.logoUrl} alt={igreja.nome} />
-                    ) : (
-                        <div className="sidebar-logo-placeholder">
-                            {igreja.nome.charAt(0)}
-                        </div>
-                    )}
-
-                    <div>
-                        <strong>{igreja.nome}</strong>
-                        <span>Gestão de Igrejas</span>
-                    </div>
+                <div className="sidebar-trigger">
+                    <Menu size={22} />
                 </div>
 
-                <nav className="sidebar-nav">
-                    <NavLink to="/home">
-                        <Home size={20} />
-                        Início
-                    </NavLink>
+                <div className="sidebar-content">
+                    <div className="sidebar-brand">
+                        {igreja.logoUrl ? (
+                            <img src={igreja.logoUrl} alt={igreja.nome} />
+                        ) : (
+                            <div className="sidebar-logo-placeholder">
+                                {igreja.nome.charAt(0)}
+                            </div>
+                        )}
 
-                    <NavLink to="/membros">
-                        <Users size={20} />
-                        Membros
-                    </NavLink>
+                        <div>
+                            <strong>{igreja.nome}</strong>
+                            <span>Gestão de Igrejas</span>
+                        </div>
+                    </div>
 
-                    <NavLink to="/celulas">
-                        <Network size={20} />
-                        Células
-                    </NavLink>
+                    <nav className="sidebar-nav">
+                        <NavLink to="/home">
+                            <Home size={20} />
+                            Início
+                        </NavLink>
 
-                    <NavLink to="/ministerios">
-                        <Music size={20} />
-                        Ministérios
-                    </NavLink>
+                        <NavLink to="/configuracoes">
+                            <Settings size={20} />
+                            Configurações
+                        </NavLink>
 
-                    <NavLink to="/escalas">
-                        <CalendarDays size={20} />
-                        Escalas
-                    </NavLink>
-
-                    <NavLink to="/financeiro">
-                        <Wallet size={20} />
-                        Financeiro
-                    </NavLink>
-
-                    <NavLink to="/inventario">
-                        <Boxes size={20} />
-                        Inventário
-                    </NavLink>
-                </nav>
-
-                <div className="sidebar-footer">
-                    <NavLink to="/configuracoes">
-                        <Settings size={20} />
-                        Configurações
-                    </NavLink>
-
-                    <button onClick={sair}>
-                        <LogOut size={20} />
-                        Sair
-                    </button>
+                        <button onClick={sair}>
+                            <LogOut size={20} />
+                            Sair
+                        </button>
+                    </nav>
                 </div>
             </aside>
 
             <div className="main-shell">
                 <header className="topbar">
-                    <div>
+                    <button
+                        className="topbar-home-button"
+                        onClick={() => navigate("/home")}
+                    >
+                        <Home size={18} />
+                        Início
+                    </button>
+
+                    <div className="topbar-center">
                         <strong>{igreja.nome}</strong>
                         <span>Sistema de gestão ministerial</span>
                     </div>
