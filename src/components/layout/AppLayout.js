@@ -29,15 +29,17 @@ function AppLayout() {
                             <strong>{igreja.nome}</strong>
                             <span>Sistema de gestão ministerial</span>
                         </div>
-
-                        <button
-                            className="topbar-home-button"
-                            onClick={() => navigate("/home")}
-                        >
-                            <Home size={18} />
-                            Início
-                        </button>
                     </div>
+
+                    <button
+                        className="topbar-home-button"
+                        onClick={() => navigate("/home")}
+                    >
+                        <Home size={18} />
+                        Início
+                    </button>
+
+                    <div className="topbar-spacer" />
 
                     <div className="topbar-right">
                         <div className="topbar-user">
