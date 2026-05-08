@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "./components/layout/AppLayout";
 
@@ -16,8 +15,6 @@ import Configuracoes from "./pages/Configuracoes";
 
 import "./App.css";
 
-const API_URL = "https://igreja-backend-eyfg.onrender.com";
-
 function PrivateRoute({ children }) {
     const logado = localStorage.getItem("logado");
 
@@ -25,34 +22,8 @@ function PrivateRoute({ children }) {
 }
 
 function App() {
-    const [backendAcordando, setBackendAcordando] = useState(false);
-
-    useEffect(() => {
-        const acordarBackend = async () => {
-            setBackendAcordando(true);
-
-            try {
-                await fetch(`${API_URL}/ministerios`);
-            } catch (error) {
-                console.log("Servidor ainda acordando...");
-            } finally {
-                setTimeout(() => {
-                    setBackendAcordando(false);
-                }, 8000);
-            }
-        };
-
-        acordarBackend();
-    }, []);
-
     return (
         <BrowserRouter>
-            {backendAcordando && (
-                <div className="server-wakeup-alert">
-                    Servidor iniciando... os dados podem levar alguns segundos para carregar.
-                </div>
-            )}
-
             <Routes>
                 <Route path="/" element={<Login />} />
 
@@ -67,23 +38,31 @@ function App() {
                     <Route path="/membros" element={<Membros />} />
                     <Route path="/celulas" element={<Celulas />} />
                     <Route path="/ministerios" element={<Ministerios />} />
+
                     <Route
                         path="/ministerios/:ministerioId/escalas"
                         element={<EscalasMinisterios />}
                     />
+
                     <Route path="/financeiro" element={<Financeiro />} />
+
                     <Route
                         path="/financeiro/relatorio"
                         element={<RelatorioFinanceiro />}
                     />
+
                     <Route
                         path="/financeiro/:tipo"
                         element={<LancamentoFinanceiro />}
                     />
+
                     <Route path="/inventario" element={<Inventario />} />
+
+                    <Route
+                        path="/configuracoes"
+                        element={<Configuracoes />}
+                    />
                 </Route>
-                <Route path="/configuracoes" element={<Configuracoes />} />
-                
             </Routes>
         </BrowserRouter>
     );
