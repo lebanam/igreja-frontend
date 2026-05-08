@@ -15,35 +15,34 @@
     border-bottom: 1px solid var(--bg-card-hover);
     padding: 0 56px;
     display: grid;
-    grid-template-columns: 220px 1fr 260px;
+    grid-template-columns: 280px 1fr auto;
     align-items: center;
     gap: 24px;
 }
 
-.topbar-left {
+.topbar-brand {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.topbar-brand strong {
+    color: var(--text-primary);
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.topbar-brand span {
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
 .topbar-center {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 24px;
     min-width: 0;
-    text-align: center;
-}
-
-.topbar-center strong {
-    display: block;
-    color: var(--text-primary);
-    font-size: 18px;
-    line-height: 1.2;
-}
-
-.topbar-center span {
-    color: var(--text-secondary);
-    font-size: 13px;
 }
 
 .topbar-home-button {
@@ -64,6 +63,15 @@
 
 .topbar-home-button:hover {
     background: var(--bg-card-hover);
+}
+
+.topbar-church-name {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .topbar-right {
@@ -189,10 +197,16 @@
         gap: 14px;
     }
 
-    .topbar-left,
+    .topbar-brand,
     .topbar-center,
     .topbar-right {
         justify-content: center;
+        text-align: center;
+    }
+
+    .topbar-center {
+        flex-direction: column;
+        gap: 12px;
     }
 
     .topbar-right {

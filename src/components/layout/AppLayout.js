@@ -24,7 +24,12 @@ function AppLayout() {
         <div className="app-layout">
             <div className="main-shell">
                 <header className="topbar">
-                    <div className="topbar-left">
+                    <div className="topbar-brand">
+                        <strong>Igreja360</strong>
+                        <span>Sistema de gestão ministerial</span>
+                    </div>
+
+                    <div className="topbar-center">
                         <button
                             className="topbar-home-button"
                             onClick={() => navigate("/home")}
@@ -32,11 +37,10 @@ function AppLayout() {
                             <Home size={18} />
                             Início
                         </button>
-                    </div>
 
-                    <div className="topbar-center">
-                        <strong>{igreja.nome || "Minha Igreja"}</strong>
-                        <span>Igreja360 • Sistema de gestão ministerial</span>
+                        <strong className="topbar-church-name">
+                            {igreja.nome || "Minha Igreja"}
+                        </strong>
                     </div>
 
                     <div className="topbar-right">
