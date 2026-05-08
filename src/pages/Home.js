@@ -24,20 +24,11 @@ function Home() {
         { title: "Kids", icon: Baby, action: () => alert("Em breve") },
         { title: "Eventos", icon: CalendarDays, action: () => alert("Em breve") },
         { title: "Dashboard", icon: BarChart3, action: () => alert("Em breve") },
-        { title: "Inventário", icon: Package, action: () => navigate("/inventario") },
+        { title: "Inventário", icon: Package, action: () => navigate("/inventario") }
     ];
-
-    const sair = () => {
-        localStorage.removeItem("logado");
-        navigate("/");
-    };
 
     return (
         <main className="home-page">
-            <header className="home-header">
-
-            </header>
-
             <section className="home-grid">
                 {cards.map((card, index) => {
                     const Icon = card.icon;
