@@ -12,6 +12,7 @@ import Financeiro from "./pages/Financeiro";
 import LancamentoFinanceiro from "./pages/LancamentoFinanceiro";
 import RelatorioFinanceiro from "./pages/RelatorioFinanceiro";
 import Inventario from "./pages/Inventario";
+import Configuracoes from "./pages/Configuracoes";
 
 import "./App.css";
 
@@ -81,6 +82,8 @@ function App() {
                     />
                     <Route path="/inventario" element={<Inventario />} />
                 </Route>
+                <Route path="/configuracoes" element={<Configuracoes />} />
+                
             </Routes>
         </BrowserRouter>
     );
