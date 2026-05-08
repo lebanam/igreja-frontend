@@ -24,17 +24,19 @@ function AppLayout() {
         <div className="app-layout">
             <div className="main-shell">
                 <header className="topbar">
-                    <button
-                        className="topbar-home-button"
-                        onClick={() => navigate("/home")}
-                    >
-                        <Home size={18} />
-                        Início
-                    </button>
+                    <div className="topbar-left">
+                        <div className="topbar-center">
+                            <strong>{igreja.nome}</strong>
+                            <span>Sistema de gestão ministerial</span>
+                        </div>
 
-                    <div className="topbar-center">
-                        <strong>{igreja.nome}</strong>
-                        <span>Sistema de gestão ministerial</span>
+                        <button
+                            className="topbar-home-button"
+                            onClick={() => navigate("/home")}
+                        >
+                            <Home size={18} />
+                            Início
+                        </button>
                     </div>
 
                     <div className="topbar-right">
