@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
+
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Membros from "./pages/Membros";
@@ -10,6 +12,7 @@ import Financeiro from "./pages/Financeiro";
 import LancamentoFinanceiro from "./pages/LancamentoFinanceiro";
 import RelatorioFinanceiro from "./pages/RelatorioFinanceiro";
 import Inventario from "./pages/Inventario";
+
 import "./App.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
@@ -53,78 +56,31 @@ function App() {
                 <Route path="/" element={<Login />} />
 
                 <Route
-                    path="/home"
                     element={
                         <PrivateRoute>
-                            <Home />
+                            <AppLayout />
                         </PrivateRoute>
                     }
-                />
-
-                <Route
-                    path="/membros"
-                    element={
-                        <PrivateRoute>
-                            <Membros />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/celulas"
-                    element={
-                        <PrivateRoute>
-                            <Celulas />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/ministerios"
-                    element={
-                        <PrivateRoute>
-                            <Ministerios />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/ministerios/:ministerioId/escalas"
-                    element={
-                        <PrivateRoute>
-                            <EscalasMinisterios />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/financeiro"
-                    element={
-                        <PrivateRoute>
-                            <Financeiro />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/financeiro/:tipo"
-                    element={
-                        <PrivateRoute>
-                            <LancamentoFinanceiro />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route
-                    path="/financeiro/relatorio"
-                    element={
-                        <PrivateRoute>
-                            <RelatorioFinanceiro />
-                        </PrivateRoute>
-                    }
-                />
-
-                <Route path="/inventario" element={<Inventario />} />
+                >
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/membros" element={<Membros />} />
+                    <Route path="/celulas" element={<Celulas />} />
+                    <Route path="/ministerios" element={<Ministerios />} />
+                    <Route
+                        path="/ministerios/:ministerioId/escalas"
+                        element={<EscalasMinisterios />}
+                    />
+                    <Route path="/financeiro" element={<Financeiro />} />
+                    <Route
+                        path="/financeiro/relatorio"
+                        element={<RelatorioFinanceiro />}
+                    />
+                    <Route
+                        path="/financeiro/:tipo"
+                        element={<LancamentoFinanceiro />}
+                    />
+                    <Route path="/inventario" element={<Inventario />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

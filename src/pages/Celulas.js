@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Home } from "lucide-react";
 import "./Celulas.css";
@@ -6,8 +5,6 @@ import "./Celulas.css";
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
 
 function Celulas() {
-    const navigate = useNavigate();
-
     const [celulas, setCelulas] = useState([]);
     const [membros, setMembros] = useState([]);
     const [relatorios, setRelatorios] = useState([]);
@@ -397,10 +394,6 @@ function Celulas() {
 
     return (
         <div className="page">
-            <button className="back-button" onClick={() => navigate("/home")}>
-                Início
-            </button>
-
             <h1 className="page-title">Células</h1>
 
             <button className="primary-button" onClick={() => setModoFormulario(true)}>
