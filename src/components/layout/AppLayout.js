@@ -22,46 +22,6 @@ function AppLayout() {
 
     return (
         <div className="app-layout">
-            <aside className="sidebar">
-                <div className="sidebar-trigger">
-                    <Menu size={22} />
-                </div>
-
-                <div className="sidebar-content">
-                    <div className="sidebar-brand">
-                        {igreja.logoUrl ? (
-                            <img src={igreja.logoUrl} alt={igreja.nome} />
-                        ) : (
-                            <div className="sidebar-logo-placeholder">
-                                {igreja.nome.charAt(0)}
-                            </div>
-                        )}
-
-                        <div>
-                            <strong>{igreja.nome}</strong>
-                            <span>Gestão de Igrejas</span>
-                        </div>
-                    </div>
-
-                    <nav className="sidebar-nav">
-                        <NavLink to="/home">
-                            <Home size={20} />
-                            Início
-                        </NavLink>
-
-                        <NavLink to="/configuracoes">
-                            <Settings size={20} />
-                            Configurações
-                        </NavLink>
-
-                        <button onClick={sair}>
-                            <LogOut size={20} />
-                            Sair
-                        </button>
-                    </nav>
-                </div>
-            </aside>
-
             <div className="main-shell">
                 <header className="topbar">
                     <button
@@ -77,14 +37,39 @@ function AppLayout() {
                         <span>Sistema de gestão ministerial</span>
                     </div>
 
-                    <div className="topbar-user">
-                        <div>
-                            <strong>{usuario.nome}</strong>
-                            <span>{usuario.role}</span>
+                    <div className="topbar-right">
+                        <div className="topbar-user">
+                            <div>
+                                <strong>{usuario.nome}</strong>
+                                <span>{usuario.role}</span>
+                            </div>
+
+                            <div className="user-avatar">
+                                {usuario.nome.charAt(0)}
+                            </div>
                         </div>
 
-                        <div className="user-avatar">
-                            {usuario.nome.charAt(0)}
+                        <div className="sidebar-header">
+                            <div className="sidebar-trigger">
+                                <Menu size={22} />
+                            </div>
+
+                            <div className="sidebar-dropdown">
+                                <NavLink to="/home">
+                                    <Home size={18} />
+                                    Início
+                                </NavLink>
+
+                                <NavLink to="/configuracoes">
+                                    <Settings size={18} />
+                                    Configurações
+                                </NavLink>
+
+                                <button onClick={sair}>
+                                    <LogOut size={18} />
+                                    Sair
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </header>

@@ -117,19 +117,25 @@ function Ministerios() {
 
     return (
         <div className="page">
-            <button className="back-button" onClick={() => navigate("/home")}>
-                Início
-            </button>
-
             <h1 className="page-title">Ministérios</h1>
 
-            <button className="primary-button" onClick={() => setModoFormulario(true)}>
+            <button
+                className="primary-button"
+                onClick={() => {
+                    setMinisterioSelecionado(null);
+                    setModoFormulario(true);
+                }}
+            >
                 Novo Ministério
             </button>
 
             {modoFormulario && (
                 <div className="form-card">
-                    <h2>{ministerioSelecionado ? "Editar Ministério" : "Cadastrar Ministério"}</h2>
+                    <h2>
+                        {ministerioSelecionado
+                            ? "Editar Ministério"
+                            : "Cadastrar Ministério"}
+                    </h2>
 
                     <input
                         placeholder="Nome do ministério"
@@ -144,11 +150,17 @@ function Ministerios() {
                     />
 
                     <div className="button-row">
-                        <button className="primary-button" onClick={salvarMinisterio}>
+                        <button
+                            className="primary-button"
+                            onClick={salvarMinisterio}
+                        >
                             Salvar
                         </button>
 
-                        <button className="secondary-button" onClick={limparFormulario}>
+                        <button
+                            className="secondary-button"
+                            onClick={limparFormulario}
+                        >
                             Cancelar
                         </button>
                     </div>
@@ -160,13 +172,17 @@ function Ministerios() {
                     <div
                         key={ministerio.id}
                         className="menu-card"
-                        onClick={() => setMinisterioSelecionado(ministerio)}
+                        onClick={() => {
+                            setMinisterioSelecionado(ministerio);
+                            setModoFormulario(false);
+                        }}
                     >
                         <div className="menu-icon">
                             <UsersRound size={28} />
                         </div>
 
                         <strong>{ministerio.nome}</strong>
+
                         <p>{ministerio.descricao || "Sem descrição"}</p>
                     </div>
                 ))}
@@ -198,7 +214,9 @@ function Ministerios() {
 
                         <button
                             className="danger-button"
-                            onClick={() => excluirMinisterio(ministerioSelecionado.id)}
+                            onClick={() =>
+                                excluirMinisterio(ministerioSelecionado.id)
+                            }
                         >
                             Excluir
                         </button>

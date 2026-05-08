@@ -36,8 +36,8 @@ function Home() {
         <main className="home-page">
             <header className="home-header">
                 <div>
-                    <h1>Igreja360</h1>
-                    <p>Gestão simples e organizada para sua igreja</p>
+                    <h1> </h1>
+                    <p>  </p>
                 </div>
 
                 <button className="logout-button" onClick={sair}>

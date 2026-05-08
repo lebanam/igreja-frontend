@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Boxes } from "lucide-react";
 import "./Inventario.css";
 
 const API_URL = "https://igreja-backend-eyfg.onrender.com";
 
 function Inventario() {
-    const navigate = useNavigate();
-
     const [categorias, setCategorias] = useState([]);
     const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
 
@@ -294,10 +291,6 @@ function Inventario() {
 
     return (
         <div className="page">
-            <button className="back-button" onClick={() => navigate("/home")}>
-                Início
-            </button>
-
             <h1 className="page-title">Inventário</h1>
 
             <button className="primary-button" onClick={abrirNovaCategoria}>

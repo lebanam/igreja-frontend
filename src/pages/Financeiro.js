@@ -25,10 +25,6 @@ function Financeiro() {
 
     return (
         <div className="page">
-            <button className="back-button" onClick={() => navigate("/home")}>
-                Início
-            </button>
-
             <h1 className="page-title">Financeiro</h1>
 
             <div className="card-grid celulas-grid">
