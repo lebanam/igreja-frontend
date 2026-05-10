@@ -1,0 +1,185 @@
+import { useEffect, useState } from "react";
+import {
+    Users,
+    Home as HomeIcon,
+    Folder,
+    Wallet,
+    TrendingUp,
+    TrendingDown,
+    BarChart3
+} from "lucide-react";
+import { API_URL } from "../config/api";
+import "./Dashboard.css";
+
+function Dashboard() {
+    const [dados, setDados] = useState(null);
+    const [carregando, setCarregando] = useState(true);
+
+    useEffect(() => {
+        carregarDashboard();
+    }, []);
+
+    const carregarDashboard = async () => {
+        try {
+            const response = await fetch(`${API_URL}/dashboard`);
+
+            if (!response.ok) {
+                throw new Error("Erro ao carregar dashboard");
+            }
+
+            const data = await response.json();
+            setDados(data);
+        } catch (error) {
+            alert(error.message);
+            setDados(null);
+        } finally {
+            setCarregando(false);
+        }
+    };
+
+    const formatarMoeda = (valor) => {
+        return Number(valor || 0).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    };
+
+    if (carregando) {
+        return (
+            <div className="page">
+                <h1 className="page-title">Dashboard</h1>
+                <p>Carregando dados...</p>
+            </div>
+        );
+    }
+
+    if (!dados) {
+        return (
+            <div className="page">
+                <h1 className="page-title">Dashboard</h1>
+                <p>Não foi possível carregar os dados do dashboard.</p>
+            </div>
+        );
+    }
+
+    const cards = [
+        {
+            titulo: "Membros",
+            valor: dados.totalMembros || 0,
+            descricao: "Total cadastrado",
+            icon: Users
+        },
+        {
+            titulo: "Células",
+            valor: dados.totalCelulas || 0,
+            descricao: "Células cadastradas",
+            icon: HomeIcon
+        },
+        {
+            titulo: "Ministérios",
+            valor: dados.totalMinisterios || 0,
+            descricao: "Ministérios ativos",
+            icon: Folder
+        },
+        {
+            titulo: "Saldo do mês",
+            valor: formatarMoeda(dados.saldoMes),
+            descricao: "Entradas - saídas",
+            icon: Wallet
+        }
+    ];
+
+    return (
+        <div className="page dashboard-page">
+            <div className="dashboard-header">
+                <div>
+                    <h1 className="page-title">Dashboard</h1>
+                    <p className="dashboard-subtitle">
+                        Visão geral da igreja neste mês.
+                    </p>
+                </div>
+            </div>
+
+            <section className="dashboard-cards">
+                {cards.map((card, index) => {
+                    const Icon = card.icon;
+
+                    return (
+                        <div key={index} className="dashboard-card">
+                            <div className="dashboard-card-icon">
+                                <Icon size={24} />
+                            </div>
+
+                            <div>
+                                <span>{card.titulo}</span>
+                                <strong>{card.valor}</strong>
+                                <p>{card.descricao}</p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </section>
+
+            <section className="dashboard-grid">
+                <div className="dashboard-panel">
+                    <div className="dashboard-panel-header">
+                        <h2>Financeiro do mês</h2>
+                        <BarChart3 size={20} />
+                    </div>
+
+                    <div className="financeiro-resumo">
+                        <div className="financeiro-linha">
+                            <div>
+                                <TrendingUp size={18} />
+                                <span>Entradas</span>
+                            </div>
+
+                            <strong className="valor-positivo">
+                                {formatarMoeda(dados.entradasMes)}
+                            </strong>
+                        </div>
+
+                        <div className="financeiro-linha">
+                            <div>
+                                <TrendingDown size={18} />
+                                <span>Saídas</span>
+                            </div>
+
+                            <strong className="valor-negativo">
+                                {formatarMoeda(dados.saidasMes)}
+                            </strong>
+                        </div>
+
+                        <div className="financeiro-linha financeiro-total">
+                            <div>
+                                <Wallet size={18} />
+                                <span>Saldo</span>
+                            </div>
+
+                            <strong>{formatarMoeda(dados.saldoMes)}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="dashboard-panel">
+                    <div className="dashboard-panel-header">
+                        <h2>Gráfico financeiro</h2>
+                        <BarChart3 size={20} />
+                    </div>
+
+                    <div className="grafico-placeholder">
+                        <BarChart3 size={42} />
+                        <p>
+                            Espaço reservado para gráfico de entradas e saídas.
+                        </p>
+                        <small>
+                            Próximo passo: buscar dados dos últimos meses e renderizar com Recharts.
+                        </small>
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export default Dashboard;

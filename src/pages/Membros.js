@@ -9,7 +9,6 @@ function Membros() {
     return (
         <div className="page">
             <h1 className="page-title">
-                <List size={24} />
                 Membros
             </h1>
 
