@@ -6,14 +6,28 @@ import {
     Wallet,
     TrendingUp,
     TrendingDown,
-    BarChart3
+    BarChart3,
+    PieChart,
+    Boxes,
+    Church
 } from "lucide-react";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Legend
+} from "recharts";
 import { API_URL } from "../config/api";
 import "./Dashboard.css";
 
 function Dashboard() {
     const [dados, setDados] = useState(null);
     const [carregando, setCarregando] = useState(true);
+    const [graficoSelecionado, setGraficoSelecionado] = useState("financeiro");
 
     useEffect(() => {
         carregarDashboard();
@@ -89,6 +103,33 @@ function Dashboard() {
         }
     ];
 
+    const graficos = [
+        {
+            id: "financeiro",
+            titulo: "Financeiro",
+            descricao: "Entradas, saídas e saldo",
+            icon: BarChart3
+        },
+        {
+            id: "membros",
+            titulo: "Membros",
+            descricao: "Crescimento e cadastros",
+            icon: Users
+        },
+        {
+            id: "celulas",
+            titulo: "Células",
+            descricao: "Presença e visitantes",
+            icon: Church
+        },
+        {
+            id: "inventario",
+            titulo: "Inventário",
+            descricao: "Itens e estoque",
+            icon: Boxes
+        }
+    ];
+
     return (
         <div className="page dashboard-page">
             <div className="dashboard-header">
@@ -124,7 +165,7 @@ function Dashboard() {
                 <div className="dashboard-panel">
                     <div className="dashboard-panel-header">
                         <h2>Financeiro do mês</h2>
-                        <BarChart3 size={20} />
+                        <Wallet size={20} />
                     </div>
 
                     <div className="financeiro-resumo">
@@ -163,20 +204,91 @@ function Dashboard() {
 
                 <div className="dashboard-panel">
                     <div className="dashboard-panel-header">
-                        <h2>Gráfico financeiro</h2>
-                        <BarChart3 size={20} />
+                        <h2>Análises por setor</h2>
+                        <PieChart size={20} />
                     </div>
 
-                    <div className="grafico-placeholder">
-                        <BarChart3 size={42} />
-                        <p>
-                            Espaço reservado para gráfico de entradas e saídas.
-                        </p>
-                        <small>
-                            Próximo passo: buscar dados dos últimos meses e renderizar com Recharts.
-                        </small>
+                    <div className="dashboard-analises">
+                        {graficos.map((grafico) => {
+                            const Icon = grafico.icon;
+
+                            return (
+                                <button
+                                    key={grafico.id}
+                                    className={
+                                        graficoSelecionado === grafico.id
+                                            ? "analise-card analise-card-ativo"
+                                            : "analise-card"
+                                    }
+                                    onClick={() => setGraficoSelecionado(grafico.id)}
+                                >
+                                    <Icon size={22} />
+                                    <div>
+                                        <strong>{grafico.titulo}</strong>
+                                        <span>{grafico.descricao}</span>
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
+            </section>
+
+            <section className="dashboard-panel dashboard-chart-panel">
+                <div className="dashboard-panel-header">
+                    <h2>
+                        {graficoSelecionado === "financeiro"
+                            ? "Financeiro dos últimos 3 meses"
+                            : "Análise em breve"}
+                    </h2>
+
+                    <BarChart3 size={20} />
+                </div>
+
+                {graficoSelecionado === "financeiro" ? (
+                    <div className="dashboard-chart">
+                        <ResponsiveContainer width="100%" height={320}>
+                            <LineChart data={dados.graficoFinanceiro || []}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="mes" />
+                                <YAxis />
+                                <Tooltip
+                                    formatter={(value) => formatarMoeda(value)}
+                                />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="entradas"
+                                    name="Entradas"
+                                    stroke="#16a34a"
+                                    strokeWidth={3}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="saidas"
+                                    name="Saídas"
+                                    stroke="#dc2626"
+                                    strokeWidth={3}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="saldo"
+                                    name="Saldo"
+                                    stroke="#2563eb"
+                                    strokeWidth={3}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                ) : (
+                    <div className="grafico-placeholder">
+                        <BarChart3 size={42} />
+                        <p>Esse gráfico será implementado na próxima etapa.</p>
+                        <small>
+                            A estrutura já está pronta para alternar entre setores.
+                        </small>
+                    </div>
+                )}
             </section>
         </div>
     );
