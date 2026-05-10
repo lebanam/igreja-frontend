@@ -1,20 +1,20 @@
-.dashboard-page {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.dashboard-header {
+.page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.dashboard-subtitle {
+.page-subtitle {
     color: var(--text-secondary);
     margin-top: -8px;
+    font-size: 14px;
 }
 
+.dashboard-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

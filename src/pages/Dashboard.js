@@ -132,11 +132,12 @@ function Dashboard() {
 
     return (
         <div className="page dashboard-page">
-            <div className="dashboard-header">
+            <div className="page-header">
                 <div>
                     <h1 className="page-title">Dashboard</h1>
-                    <p className="dashboard-subtitle">
-                        Visão geral da igreja neste mês.
+
+                    <p className="page-subtitle">
+                        Visão geral da igreja e indicadores principais.
                     </p>
                 </div>
             </div>
