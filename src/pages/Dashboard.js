@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { API_URL } from "../config/api";
 import "./Dashboard.css";
+import "./Celulas.css";
 
 function Dashboard() {
     const [dados, setDados] = useState(null);
