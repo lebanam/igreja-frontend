@@ -57,6 +57,7 @@ function App() {
                         element={<LancamentoFinanceiro />}
                     />
 
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/inventario" element={<Inventario />} />
 
                     <Route
@@ -64,7 +65,6 @@ function App() {
                         element={<Configuracoes />}
                     />
                 </Route>
-                <Route path="/dashboard" element={<Dashboard />} />
 
             </Routes>
         </BrowserRouter>
