@@ -9,7 +9,8 @@ import {
     BarChart3,
     PieChart,
     Boxes,
-    Church
+    Church,
+    LayoutDashboard
 } from "lucide-react";
 import {
     LineChart,
@@ -60,18 +61,32 @@ function Dashboard() {
 
     if (carregando) {
         return (
-            <div className="page">
-                <h1 className="page-title">Dashboard</h1>
-                <p>Carregando dados...</p>
+            <div className="page dashboard-page">
+                <div className="dashboard-page-header">
+                    <div className="dashboard-page-title">
+                        <LayoutDashboard size={26} />
+                        <div>
+                            <h1>Dashboard</h1>
+                            <p>Carregando indicadores da igreja...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (!dados) {
         return (
-            <div className="page">
-                <h1 className="page-title">Dashboard</h1>
-                <p>Não foi possível carregar os dados do dashboard.</p>
+            <div className="page dashboard-page">
+                <div className="dashboard-page-header">
+                    <div className="dashboard-page-title">
+                        <LayoutDashboard size={26} />
+                        <div>
+                            <h1>Dashboard</h1>
+                            <p>Não foi possível carregar os dados do dashboard.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -132,13 +147,14 @@ function Dashboard() {
 
     return (
         <div className="page dashboard-page">
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Dashboard</h1>
+            <div className="dashboard-page-header">
+                <div className="dashboard-page-title">
+                    <LayoutDashboard size={26} />
 
-                    <p className="page-subtitle">
-                        Visão geral da igreja e indicadores principais.
-                    </p>
+                    <div>
+                        <h1>Dashboard</h1>
+                        <p>Visão geral da igreja e indicadores principais.</p>
+                    </div>
                 </div>
             </div>
 
@@ -224,6 +240,7 @@ function Dashboard() {
                                     onClick={() => setGraficoSelecionado(grafico.id)}
                                 >
                                     <Icon size={22} />
+
                                     <div>
                                         <strong>{grafico.titulo}</strong>
                                         <span>{grafico.descricao}</span>
@@ -253,10 +270,9 @@ function Dashboard() {
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="mes" />
                                 <YAxis />
-                                <Tooltip
-                                    formatter={(value) => formatarMoeda(value)}
-                                />
+                                <Tooltip formatter={(value) => formatarMoeda(value)} />
                                 <Legend />
+
                                 <Line
                                     type="monotone"
                                     dataKey="entradas"
@@ -264,6 +280,7 @@ function Dashboard() {
                                     stroke="#16a34a"
                                     strokeWidth={3}
                                 />
+
                                 <Line
                                     type="monotone"
                                     dataKey="saidas"
@@ -271,6 +288,7 @@ function Dashboard() {
                                     stroke="#dc2626"
                                     strokeWidth={3}
                                 />
+
                                 <Line
                                     type="monotone"
                                     dataKey="saldo"
@@ -284,7 +302,9 @@ function Dashboard() {
                 ) : (
                     <div className="grafico-placeholder">
                         <BarChart3 size={42} />
+
                         <p>Esse gráfico será implementado na próxima etapa.</p>
+
                         <small>
                             A estrutura já está pronta para alternar entre setores.
                         </small>
