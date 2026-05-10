@@ -9,8 +9,7 @@ import {
     BarChart3,
     PieChart,
     Boxes,
-    Church,
-    LayoutDashboard
+    Church
 } from "lucide-react";
 import {
     LineChart,
@@ -62,30 +61,18 @@ function Dashboard() {
 
     if (carregando) {
         return (
-            <div className="page dashboard-page">
-                <h1 className="page-title">
-                    <LayoutDashboard size={24} />
-                    Dashboard
-                </h1>
-
-                <p className="dashboard-subtitle">
-                    Carregando indicadores da igreja...
-                </p>
+            <div className="page">
+                <h1 className="page-title">Dashboard</h1>
+                <p>Carregando dados...</p>
             </div>
         );
     }
 
     if (!dados) {
         return (
-            <div className="page dashboard-page">
-                <h1 className="page-title">
-                    <LayoutDashboard size={24} />
-                    Dashboard
-                </h1>
-
-                <p className="dashboard-subtitle">
-                    Não foi possível carregar os dados do dashboard.
-                </p>
+            <div className="page">
+                <h1 className="page-title">Dashboard</h1>
+                <p>Não foi possível carregar os dados do dashboard.</p>
             </div>
         );
     }
@@ -145,15 +132,8 @@ function Dashboard() {
     ];
 
     return (
-        <div className="page dashboard-page">
-            <h1 className="page-title">
-                <LayoutDashboard size={24} />
-                Dashboard
-            </h1>
-
-            <p className="dashboard-subtitle">
-                Visão geral da igreja e indicadores principais.
-            </p>
+        <div className="page">
+            <h1 className="page-title">Dashboard</h1>
 
             <section className="dashboard-cards">
                 {cards.map((card, index) => {
