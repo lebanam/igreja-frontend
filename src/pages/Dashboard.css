@@ -226,3 +226,28 @@
         grid-template-columns: 1fr;
     }
 }
+
+.dashboard-membros-graficos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.dashboard-chart-box {
+    background: var(--bg-primary);
+    border: 1px solid var(--bg-card-hover);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.dashboard-chart-box h3 {
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    font-size: 16px;
+}
+
+@media (max-width: 900px) {
+    .dashboard-membros-graficos {
+        grid-template-columns: 1fr;
+    }
+}

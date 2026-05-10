@@ -19,7 +19,10 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Legend
+    Legend,
+    PieChart as RechartsPieChart,
+    Pie,
+    Cell
 } from "recharts";
 import { API_URL } from "../config/api";
 import "./Dashboard.css";
@@ -276,17 +279,73 @@ function Dashboard() {
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
+                ) : graficoSelecionado === "membros" ? (
+                    <div className="dashboard-membros-graficos">
+                        <div className="dashboard-chart-box">
+                            <h3>Membros em célula</h3>
+
+                            <ResponsiveContainer width="100%" height={280}>
+                                <RechartsPieChart>
+                                    <Pie
+                                        data={[
+                                            {
+                                                name: "Com célula",
+                                                value: dados.graficoMembrosCelula?.comCelula || 0
+                                            },
+                                            {
+                                                name: "Sem célula",
+                                                value: dados.graficoMembrosCelula?.semCelula || 0
+                                            }
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        outerRadius={90}
+                                        dataKey="value"
+                                        label
+                                    >
+                                        <Cell fill="#2563eb" />
+                                        <Cell fill="#f97316" />
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </RechartsPieChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <div className="dashboard-chart-box">
+                            <h3>Visitantes nas células</h3>
+
+                            <ResponsiveContainer width="100%" height={280}>
+                                <LineChart data={dados.graficoVisitantes || []}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="mes" />
+                                    <YAxis allowDecimals={false} />
+                                    <Tooltip />
+                                    <Legend />
+
+                                    <Line
+                                        type="monotone"
+                                        dataKey="quantidade"
+                                        name="Visitantes"
+                                        stroke="#f97316"
+                                        strokeWidth={3}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
                 ) : (
                     <div className="grafico-placeholder">
                         <BarChart3 size={42} />
 
-                        <p>Esse gráfico será implementado na próxima etapa.</p>
+                        <p>Em breve.</p>
 
                         <small>
-                            A estrutura já está pronta para alternar entre setores.
+                            Aguardando novos dados.
                         </small>
                     </div>
                 )}
+
             </section>
         </div>
     );
