@@ -15,6 +15,12 @@
     flex-direction: column;
     gap: 24px;
 }
+.dashboard-subtitle {
+    color: var(--text-secondary);
+    margin-top: -12px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
