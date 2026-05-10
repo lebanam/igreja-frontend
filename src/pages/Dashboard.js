@@ -63,15 +63,14 @@ function Dashboard() {
     if (carregando) {
         return (
             <div className="page dashboard-page">
-                <div className="dashboard-page-header">
-                    <div className="dashboard-page-title">
-                        <LayoutDashboard size={26} />
-                        <div>
-                            <h1>Dashboard</h1>
-                            <p>Carregando indicadores da igreja...</p>
-                        </div>
-                    </div>
-                </div>
+                <h1 className="page-title">
+                    <LayoutDashboard size={24} />
+                    Dashboard
+                </h1>
+
+                <p className="dashboard-subtitle">
+                    Carregando indicadores da igreja...
+                </p>
             </div>
         );
     }
@@ -79,15 +78,14 @@ function Dashboard() {
     if (!dados) {
         return (
             <div className="page dashboard-page">
-                <div className="dashboard-page-header">
-                    <div className="dashboard-page-title">
-                        <LayoutDashboard size={26} />
-                        <div>
-                            <h1>Dashboard</h1>
-                            <p>Não foi possível carregar os dados do dashboard.</p>
-                        </div>
-                    </div>
-                </div>
+                <h1 className="page-title">
+                    <LayoutDashboard size={24} />
+                    Dashboard
+                </h1>
+
+                <p className="dashboard-subtitle">
+                    Não foi possível carregar os dados do dashboard.
+                </p>
             </div>
         );
     }
@@ -148,16 +146,14 @@ function Dashboard() {
 
     return (
         <div className="page dashboard-page">
-            <div className="dashboard-page-header">
-                <div className="dashboard-page-title">
-                    <LayoutDashboard size={26} />
+            <h1 className="page-title">
+                <LayoutDashboard size={24} />
+                Dashboard
+            </h1>
 
-                    <div>
-                        <h1>Dashboard</h1>
-                        <p>Visão geral da igreja e indicadores principais.</p>
-                    </div>
-                </div>
-            </div>
+            <p className="dashboard-subtitle">
+                Visão geral da igreja e indicadores principais.
+            </p>
 
             <section className="dashboard-cards">
                 {cards.map((card, index) => {
