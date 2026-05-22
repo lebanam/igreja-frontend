@@ -1,7 +1,12 @@
 import { useState } from "react";
 import CadastroMembro from "./CadastroMembro";
 import ListaMembros from "./ListaMembros";
-import { UserPlus, List } from "lucide-react";
+import CadastrosPendentes from "./CadastrosPendentes";
+import {
+    UserPlus,
+    List,
+    Clock3,
+} from "lucide-react";
 
 function Membros() {
     const [tela, setTela] = useState(null);
@@ -14,6 +19,7 @@ function Membros() {
 
             {!tela && (
                 <div className="card-grid">
+
                     <div
                         className="menu-card"
                         onClick={() => setTela("cadastro")}
@@ -35,6 +41,18 @@ function Membros() {
 
                         <strong>Listar</strong>
                     </div>
+
+                    <div
+                        className="menu-card"
+                        onClick={() => setTela("pendentes")}
+                    >
+                        <div className="menu-icon">
+                            <Clock3 size={28} />
+                        </div>
+
+                        <strong>Cadastros Pendentes</strong>
+                    </div>
+
                 </div>
             )}
 
@@ -49,6 +67,7 @@ function Membros() {
 
             {tela === "cadastro" && <CadastroMembro />}
             {tela === "lista" && <ListaMembros />}
+            {tela === "pendentes" && <CadastrosPendentes />}
         </div>
     );
 }
