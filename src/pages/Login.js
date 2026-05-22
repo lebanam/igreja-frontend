@@ -9,7 +9,7 @@ import {
     Phone,
     Calendar,
     MapPin,
-    Instagram,
+    AtSign,
     Heart,
     Users,
 } from "lucide-react";
@@ -293,7 +293,7 @@ function Login() {
                             </div>
 
                             <div className="input-group">
-                                <Instagram size={18} />
+                                <AtSign size={18} />
                                 <input
                                     type="text"
                                     placeholder="Instagram"
