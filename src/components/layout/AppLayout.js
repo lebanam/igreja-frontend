@@ -5,12 +5,15 @@ import "./AppLayout.css";
 function AppLayout() {
     const navigate = useNavigate();
 
-    const usuario = JSON.parse(localStorage.getItem("usuario")) || {
-        nome: "Administrador",
-        role: "ADMIN"
+    const usuarioStorage = JSON.parse(localStorage.getItem("usuario") || "null");
+
+    const usuario = usuarioStorage || {
+        nome: localStorage.getItem("usuarioNome") || "Usuário",
+        email: localStorage.getItem("usuarioEmail") || "",
+        role: localStorage.getItem("usuarioRole") || ""
     };
 
-    const igreja = JSON.parse(localStorage.getItem("igreja")) || {
+    const igreja = JSON.parse(localStorage.getItem("igreja") || "null") || {
         nome: "Minha Igreja",
         logoUrl: ""
     };
@@ -19,6 +22,10 @@ function AppLayout() {
         localStorage.clear();
         navigate("/");
     };
+
+    const inicialUsuario = usuario.nome
+        ? usuario.nome.charAt(0).toUpperCase()
+        : "U";
 
     return (
         <div className="app-layout">
@@ -65,7 +72,7 @@ function AppLayout() {
                             </div>
 
                             <div className="user-avatar">
-                                {usuario.nome.charAt(0)}
+                                {inicialUsuario}
                             </div>
                         </div>
 
