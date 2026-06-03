@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { Save, Building2 } from "lucide-react";
+import { Save, Building2, User, Lock } from "lucide-react";
 import { API_URL } from "../config/api";
 import "./Configuracoes.css";
 
 function Configuracoes() {
+    const usuarioRole = localStorage.getItem("usuarioRole");
+    const isAdmin = usuarioRole === "ADMIN";
+
     const [carregando, setCarregando] = useState(false);
     const [salvando, setSalvando] = useState(false);
 
@@ -14,9 +17,21 @@ function Configuracoes() {
     const [logoUrl, setLogoUrl] = useState("");
     const [endereco, setEndereco] = useState("");
 
+    const [perfilNome, setPerfilNome] = useState(
+        localStorage.getItem("usuarioNome") || ""
+    );
+    const [perfilEmail] = useState(
+        localStorage.getItem("usuarioEmail") || ""
+    );
+    const [senhaAtual, setSenhaAtual] = useState("");
+    const [novaSenha, setNovaSenha] = useState("");
+    const [confirmarSenha, setConfirmarSenha] = useState("");
+
     useEffect(() => {
-        carregarConfiguracoes();
-    }, []);
+        if (isAdmin) {
+            carregarConfiguracoes();
+        }
+    }, [isAdmin]);
 
     const carregarConfiguracoes = async () => {
         setCarregando(true);
@@ -88,6 +103,117 @@ function Configuracoes() {
             setSalvando(false);
         }
     };
+
+    const salvarPerfil = async () => {
+        if (!perfilNome.trim()) {
+            alert("Informe seu nome");
+            return;
+        }
+
+        localStorage.setItem("usuarioNome", perfilNome.trim());
+
+        alert("Perfil atualizado localmente. Depois vamos conectar isso ao backend.");
+        window.location.reload();
+    };
+
+    const alterarSenha = async () => {
+        if (!senhaAtual || !novaSenha || !confirmarSenha) {
+            alert("Preencha todos os campos de senha");
+            return;
+        }
+
+        if (novaSenha !== confirmarSenha) {
+            alert("A nova senha e a confirmação não coincidem");
+            return;
+        }
+
+        if (novaSenha.length < 6) {
+            alert("A nova senha deve ter no mínimo 6 caracteres");
+            return;
+        }
+
+        alert("Próximo passo: criar endpoint no backend para alteração real da senha.");
+    };
+
+    if (!isAdmin) {
+        return (
+            <div className="page">
+                <h1 className="page-title">
+                    <User size={24} />
+                    Meu Perfil
+                </h1>
+
+                <div className="configuracoes-grid">
+                    <div className="form-card configuracoes-card">
+                        <h2>Dados da conta</h2>
+
+                        <input
+                            placeholder="Nome"
+                            value={perfilNome}
+                            onChange={(e) => setPerfilNome(e.target.value)}
+                        />
+
+                        <input
+                            placeholder="Email"
+                            value={perfilEmail}
+                            disabled
+                        />
+
+                        <input
+                            placeholder="Perfil"
+                            value={usuarioRole}
+                            disabled
+                        />
+
+                        <div className="button-row">
+                            <button
+                                className="primary-button"
+                                onClick={salvarPerfil}
+                            >
+                                <Save size={18} />
+                                Salvar perfil
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="form-card configuracoes-card">
+                        <h2>Alterar senha</h2>
+
+                        <input
+                            type="password"
+                            placeholder="Senha atual"
+                            value={senhaAtual}
+                            onChange={(e) => setSenhaAtual(e.target.value)}
+                        />
+
+                        <input
+                            type="password"
+                            placeholder="Nova senha"
+                            value={novaSenha}
+                            onChange={(e) => setNovaSenha(e.target.value)}
+                        />
+
+                        <input
+                            type="password"
+                            placeholder="Confirmar nova senha"
+                            value={confirmarSenha}
+                            onChange={(e) => setConfirmarSenha(e.target.value)}
+                        />
+
+                        <div className="button-row">
+                            <button
+                                className="primary-button"
+                                onClick={alterarSenha}
+                            >
+                                <Lock size={18} />
+                                Alterar senha
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="page">
