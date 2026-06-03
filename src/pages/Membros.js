@@ -11,6 +11,9 @@ import {
 function Membros() {
     const [tela, setTela] = useState(null);
 
+    const usuarioRole = localStorage.getItem("usuarioRole");
+    const isAdmin = usuarioRole === "ADMIN";
+
     return (
         <div className="page">
             <h1 className="page-title">
@@ -19,7 +22,6 @@ function Membros() {
 
             {!tela && (
                 <div className="card-grid">
-
                     <div
                         className="menu-card"
                         onClick={() => setTela("cadastro")}
@@ -42,17 +44,18 @@ function Membros() {
                         <strong>Listar</strong>
                     </div>
 
-                    <div
-                        className="menu-card"
-                        onClick={() => setTela("pendentes")}
-                    >
-                        <div className="menu-icon">
-                            <Clock3 size={28} />
+                    {isAdmin && (
+                        <div
+                            className="menu-card"
+                            onClick={() => setTela("pendentes")}
+                        >
+                            <div className="menu-icon">
+                                <Clock3 size={28} />
+                            </div>
+
+                            <strong>Cadastros Pendentes</strong>
                         </div>
-
-                        <strong>Cadastros Pendentes</strong>
-                    </div>
-
+                    )}
                 </div>
             )}
 
@@ -67,7 +70,7 @@ function Membros() {
 
             {tela === "cadastro" && <CadastroMembro />}
             {tela === "lista" && <ListaMembros />}
-            {tela === "pendentes" && <CadastrosPendentes />}
+            {tela === "pendentes" && isAdmin && <CadastrosPendentes />}
         </div>
     );
 }
