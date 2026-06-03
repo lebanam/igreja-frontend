@@ -134,3 +134,35 @@
         min-width: 110px;
     }
 }
+
+.timeline-step {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.timeline-step:hover .timeline-dot {
+    transform: scale(1.05);
+}
+
+.timeline-section-full {
+    grid-column: 1 / -1;
+}
+
+.multi-select-list {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0.5rem 0 1rem;
+}
+
+.checkbox-card {
+    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+
+.empty-text {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
