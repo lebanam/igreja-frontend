@@ -10,6 +10,7 @@ function CadastrosPendentes() {
     const detalhesRef = useRef(null);
 
     const [batizado, setBatizado] = useState(false);
+    const [dataBatismo, setDataBatismo] = useState("");
     const [voluntario, setVoluntario] = useState(false);
     const [membroDesde, setMembroDesde] = useState("");
     const [celulaId, setCelulaId] = useState("");
@@ -74,6 +75,7 @@ function CadastrosPendentes() {
 
         setMembroSelecionadoId(membro.id);
         setBatizado(Boolean(membro.batizado));
+        setDataBatismo(membro.dataBatismo || "");
         setVoluntario(Boolean(membro.voluntario));
         setMembroDesde(membro.membroDesde || "");
         setCelulaId(membro.celula?.id || "");
@@ -92,6 +94,7 @@ function CadastrosPendentes() {
 
         const dados = {
             batizado,
+            dataBatismo: batizado && dataBatismo ? dataBatismo : null,
             voluntario,
             membroDesde: membroDesde || null,
             celulaId: celulaId ? Number(celulaId) : null,
@@ -148,62 +151,99 @@ function CadastrosPendentes() {
     };
 
     const renderizarAnalise = (membro) => (
-        <div className="detalhe-card" ref={detalhesRef}>
-            <h3>Analisar cadastro</h3>
+        <div className="detalhe-card membro-timeline-card" ref={detalhesRef}>
+            <h3>Análise do cadastro</h3>
 
-            <p><strong>Nome:</strong> {membro.nome}</p>
-            <p><strong>Email:</strong> {membro.email}</p>
-            <p><strong>Celular:</strong> {membro.telefone || "-"}</p>
-            <p><strong>Data de nascimento:</strong> {formatarData(membro.dataNascimento)}</p>
-            <p><strong>Idade:</strong> {membro.idade ?? "-"}</p>
-            <p><strong>Sexo:</strong> {formatarOpcao(membro.sexo)}</p>
-            <p><strong>Estado civil:</strong> {formatarOpcao(membro.estadoCivil)}</p>
-            <p><strong>Endereço:</strong> {membro.endereco || "-"}</p>
-            <p><strong>Instagram:</strong> {membro.instagram || "-"}</p>
-            <p><strong>Tipo:</strong> {formatarOpcao(membro.tipoCadastro)}</p>
+            <div className="membro-timeline">
+                <div className="timeline-step active">
+                    <div className="timeline-dot">1</div>
+                    <span>Dados cadastrais</span>
+                </div>
 
-            <hr />
+                <div className="timeline-line" />
 
-            <h4>Dados administrativos</h4>
+                <div className="timeline-step active">
+                    <div className="timeline-dot">2</div>
+                    <span>Dados ministeriais</span>
+                </div>
+            </div>
 
-            <label className="checkbox-field">
-                <input
-                    type="checkbox"
-                    checked={batizado}
-                    onChange={(e) => setBatizado(e.target.checked)}
-                />
-                <span>Batizado</span>
-            </label>
+            <div className="timeline-content-grid">
+                <div className="timeline-section">
+                    <h4>Dados informados pelo usuário</h4>
 
-            <label className="checkbox-field">
-                <input
-                    type="checkbox"
-                    checked={voluntario}
-                    onChange={(e) => setVoluntario(e.target.checked)}
-                />
-                <span>Voluntário</span>
-            </label>
+                    <p><strong>Nome:</strong> {membro.nome}</p>
+                    <p><strong>Email:</strong> {membro.email}</p>
+                    <p><strong>Celular:</strong> {membro.telefone || "-"}</p>
+                    <p><strong>Data de nascimento:</strong> {formatarData(membro.dataNascimento)}</p>
+                    <p><strong>Idade:</strong> {membro.idade ?? "-"}</p>
+                    <p><strong>Sexo:</strong> {formatarOpcao(membro.sexo)}</p>
+                    <p><strong>Estado civil:</strong> {formatarOpcao(membro.estadoCivil)}</p>
+                    <p><strong>Endereço:</strong> {membro.endereco || "-"}</p>
+                    <p><strong>Instagram:</strong> {membro.instagram || "-"}</p>
+                    <p><strong>Tipo:</strong> {formatarOpcao(membro.tipoCadastro)}</p>
+                </div>
 
-            <label className="field-label">Membro desde:</label>
-            <input
-                type="date"
-                value={membroDesde}
-                onChange={(e) => setMembroDesde(e.target.value)}
-            />
+                <div className="timeline-section">
+                    <h4>Dados preenchidos pelo admin</h4>
 
-            <label className="field-label">Célula:</label>
-            <select
-                value={celulaId}
-                onChange={(e) => setCelulaId(e.target.value)}
-            >
-                <option value="">Sem célula</option>
+                    <label className="field-label">Célula:</label>
+                    <select
+                        value={celulaId}
+                        onChange={(e) => setCelulaId(e.target.value)}
+                    >
+                        <option value="">Sem célula</option>
 
-                {celulas.map((celula) => (
-                    <option key={celula.id} value={celula.id}>
-                        {celula.nome}
-                    </option>
-                ))}
-            </select>
+                        {celulas.map((celula) => (
+                            <option key={celula.id} value={celula.id}>
+                                {celula.nome}
+                            </option>
+                        ))}
+                    </select>
+
+                    <label className="checkbox-field">
+                        <input
+                            type="checkbox"
+                            checked={voluntario}
+                            onChange={(e) => setVoluntario(e.target.checked)}
+                        />
+                        <span>Voluntário</span>
+                    </label>
+
+                    <label className="field-label">Membro desde:</label>
+                    <input
+                        type="date"
+                        value={membroDesde}
+                        onChange={(e) => setMembroDesde(e.target.value)}
+                    />
+
+                    <label className="checkbox-field">
+                        <input
+                            type="checkbox"
+                            checked={batizado}
+                            onChange={(e) => {
+                                setBatizado(e.target.checked);
+
+                                if (!e.target.checked) {
+                                    setDataBatismo("");
+                                }
+                            }}
+                        />
+                        <span>Batizado</span>
+                    </label>
+
+                    {batizado && (
+                        <>
+                            <label className="field-label">Data de batismo:</label>
+                            <input
+                                type="date"
+                                value={dataBatismo}
+                                onChange={(e) => setDataBatismo(e.target.value)}
+                            />
+                        </>
+                    )}
+                </div>
+            </div>
 
             <div className="button-row">
                 <button
