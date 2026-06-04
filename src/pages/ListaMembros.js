@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { API_URL } from "../config/api";
-import { formatarCPF, formatarTelefone } from "../utils/formatadores";
-import { validarEmail, validarCPF } from "../utils/validadores";
+import { formatarTelefone } from "../utils/formatadores";
+import { validarEmail } from "../utils/validadores";
 import "./Membros.css";
 
 function ListaMembros() {
@@ -16,7 +16,6 @@ function ListaMembros() {
 
     const [nomeEdit, setNomeEdit] = useState("");
     const [emailEdit, setEmailEdit] = useState("");
-    const [cpfEdit, setCpfEdit] = useState("");
     const [telefoneEdit, setTelefoneEdit] = useState("");
     const [dataNascimentoEdit, setDataNascimentoEdit] = useState("");
     const [sexoEdit, setSexoEdit] = useState("");
@@ -109,7 +108,6 @@ function ListaMembros() {
 
         setNomeEdit(membro.nome || "");
         setEmailEdit(membro.email || "");
-        setCpfEdit(membro.cpf || "");
         setTelefoneEdit(membro.telefone || "");
         setDataNascimentoEdit(membro.dataNascimento || "");
         setSexoEdit(membro.sexo || "");
@@ -128,7 +126,6 @@ function ListaMembros() {
 
         setNomeEdit("");
         setEmailEdit("");
-        setCpfEdit("");
         setTelefoneEdit("");
         setDataNascimentoEdit("");
         setSexoEdit("");
@@ -143,8 +140,8 @@ function ListaMembros() {
     };
 
     const salvarEdicao = async () => {
-        if (!nomeEdit || !emailEdit || !cpfEdit) {
-            alert("Preencha nome, email e CPF!");
+        if (!nomeEdit || !emailEdit ) {
+            alert("Preencha nome e email!");
             return;
         }
 
@@ -153,15 +150,10 @@ function ListaMembros() {
             return;
         }
 
-        if (!validarCPF(cpfEdit)) {
-            alert("CPF inválido");
-            return;
-        }
 
         const dados = {
             nome: nomeEdit,
             email: emailEdit,
-            cpf: cpfEdit,
             telefone: telefoneEdit,
             dataNascimento: dataNascimentoEdit || null,
             sexo: sexoEdit || null,
@@ -254,12 +246,6 @@ function ListaMembros() {
                 onChange={(e) => setEmailEdit(e.target.value)}
             />
 
-            <input
-                placeholder="CPF"
-                value={cpfEdit}
-                maxLength={14}
-                onChange={(e) => setCpfEdit(formatarCPF(e.target.value))}
-            />
 
             <input
                 placeholder="Telefone"
@@ -356,7 +342,6 @@ function ListaMembros() {
             <h3>{m.nome}</h3>
 
             <p><strong>Email:</strong> {m.email}</p>
-            <p><strong>CPF:</strong> {m.cpf}</p>
             <p><strong>Telefone:</strong> {m.telefone || "-"}</p>
             <p><strong>Data de nascimento:</strong> {formatarData(m.dataNascimento)}</p>
             <p><strong>Idade:</strong> {m.idade ?? "-"}</p>

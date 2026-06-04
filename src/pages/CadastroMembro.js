@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config/api";
-import { formatarCPF, formatarTelefone } from "../utils/formatadores";
-import { validarEmail, validarCPF } from "../utils/validadores";
+import { formatarTelefone } from "../utils/formatadores";
+import { validarEmail } from "../utils/validadores";
 
 function CadastroMembro() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
-    const [cpf, setCpf] = useState("");
     const [telefone, setTelefone] = useState("");
     const [dataNascimento, setDataNascimento] = useState("");
     const [sexo, setSexo] = useState("");
@@ -41,7 +40,6 @@ function CadastroMembro() {
     const limparFormulario = () => {
         setNome("");
         setEmail("");
-        setCpf("");
         setTelefone("");
         setDataNascimento("");
         setSexo("");
@@ -54,8 +52,8 @@ function CadastroMembro() {
     };
 
     const salvar = async () => {
-        if (!nome || !email || !cpf) {
-            alert("Preencha nome, email e CPF!");
+        if (!nome || !email ) {
+            alert("Preencha nome e email!");
             return;
         }
 
@@ -64,15 +62,9 @@ function CadastroMembro() {
             return;
         }
 
-        if (!validarCPF(cpf)) {
-            alert("CPF inválido");
-            return;
-        }
-
         const dados = {
             nome,
             email,
-            cpf,
             telefone,
             dataNascimento: dataNascimento || null,
             sexo: sexo || null,
@@ -124,12 +116,6 @@ function CadastroMembro() {
                 onChange={(e) => setEmail(e.target.value)}
             />
 
-            <input
-                placeholder="CPF"
-                value={cpf}
-                onChange={(e) => setCpf(formatarCPF(e.target.value))}
-                maxLength={14}
-            />
 
             <input
                 placeholder="Telefone"
